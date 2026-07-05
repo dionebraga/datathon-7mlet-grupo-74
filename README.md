@@ -171,7 +171,7 @@ docker compose up --build
 |---|---|---|
 | 🌐 **API + Swagger** (docs interativa) | `adaptive-offers serve` | http://localhost:8000/docs |
 | 📊 **Dashboard BI** (comparação, regret, decisão) | `streamlit run dashboard\app.py` | http://localhost:8501 |
-| 📈 **MLflow** (experimentos) | `$env:MLFLOW_ALLOW_FILE_STORE='true'; mlflow ui --backend-store-uri file:./mlruns --port 5000` | http://localhost:5000 |
+| 📈 **MLflow** (experimentos) | `$env:MLFLOW_ALLOW_FILE_STORE='true'; mlflow ui --backend-store-uri file:./mlruns --port 5001` | http://localhost:5001 |
 | 🧾 **Log auditável de decisões** | `Get-Content artifacts\decisions\audit.jsonl -Tail 5` | terminal |
 | 📓 **Notebook de EDA** | `jupyter lab notebooks\01_eda.ipynb` | navegador |
 

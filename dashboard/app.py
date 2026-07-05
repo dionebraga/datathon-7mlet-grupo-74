@@ -555,12 +555,13 @@ st.markdown(
       .side-legend-row {{display:flex;align-items:baseline;gap:8px;padding:5px 0;
         font-size:.88rem;color:{MUTED};line-height:1.40;}}
       .side-legend-row b {{color:{TEXT};font-weight:700;}}
-      .side-svc {{display:flex;align-items:center;justify-content:space-between;
+      .side-svc {{display:flex;align-items:center;justify-content:space-between;gap:8px;
         padding:10px 13px;margin-bottom:8px;border-radius:10px;
         background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);}}
+      .side-svc > div {{min-width:0;}}
       .side-svc .svc-name {{font-size:.92rem;font-weight:700;color:{TEXT};}}
       .side-svc .svc-cmd {{font-size:.72rem;color:{MUTED};font-family:monospace;
-        display:block;margin-top:2px;}}
+        display:block;margin-top:2px;overflow-wrap:anywhere;}}
       /* ── Expander (rastreio de execução) — card escuro coeso ──── */
       [data-testid="stExpander"] {{
         background:rgba(0,0,0,0.55) !important;
@@ -646,7 +647,8 @@ st.markdown(
       /* ── Badges de status ─────────────────────────────────────── */
       .stat {{display:inline-block;padding:5px 12px;border-radius:999px;font-size:.78rem;
         font-weight:700;margin-left:5px;background:rgba(255,255,255,.06);
-        border:1px solid rgba(255,255,255,.10);letter-spacing:.02em;}}
+        border:1px solid rgba(255,255,255,.10);letter-spacing:.02em;
+        flex-shrink:0;white-space:nowrap;line-height:1.1;}}
       .on  {{color:{GREEN};background:rgba(26,158,26,.12);border-color:rgba(26,158,26,.30);}}
       .off {{color:#64748B;background:rgba(100,116,139,.08);border-color:rgba(100,116,139,.15);}}
       /* ── Seções ───────────────────────────────────────────────── */
@@ -1146,7 +1148,7 @@ with st.sidebar:
 
     # ── Serviços ─────────────────────────────────────────────────────────────
     st.markdown('<div class="side-sect">🔌 Serviços</div>', unsafe_allow_html=True)
-    api_up, mlf_up = port_open(8000), port_open(5000) or port_open(5001) or port_open(5050)
+    api_up, mlf_up = port_open(8000), port_open(5001)
 
     def badge(up):  # noqa: ANN001
         return '<span class="stat on">● online</span>' if up else '<span class="stat off">● offline</span>'
@@ -1155,7 +1157,7 @@ with st.sidebar:
         f'<div class="side-svc"><div><span class="svc-name">API REST</span>'
         f'<span class="svc-cmd">adaptive-offers serve</span></div>{badge(api_up)}</div>'
         f'<div class="side-svc"><div><span class="svc-name">MLflow</span>'
-        f'<span class="svc-cmd">mlflow ui --port 5000</span></div>{badge(mlf_up)}</div>',
+        f'<span class="svc-cmd">mlflow ui --port 5001</span></div>{badge(mlf_up)}</div>',
         unsafe_allow_html=True,
     )
     st.divider()
@@ -1250,7 +1252,7 @@ with st.sidebar:
 # --------------------------------------------------------------------------- #
 # Topbar
 # --------------------------------------------------------------------------- #
-api_up, mlf_up = port_open(8000), port_open(5000)
+api_up, mlf_up = port_open(8000), port_open(5001)
 _active_pol = POLICY_LABEL.get(best["policy"], best["policy"])
 st.markdown(
     '<div class="topbar">'

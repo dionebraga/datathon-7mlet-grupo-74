@@ -160,7 +160,7 @@ def train_all(version: str, horizon: int, seed: int | None, register_name: str) 
     _print_comparison(metrics_matrix(proc, bundle, horizon=horizon))
     click.echo("\nVer no MLflow:  "
                "$env:MLFLOW_ALLOW_FILE_STORE='true'; "
-               "mlflow ui --backend-store-uri file:./mlruns --port 5000")
+               "mlflow ui --backend-store-uri file:./mlruns --port 5001")
 
 
 # --------------------------------------------------------------------------- #
