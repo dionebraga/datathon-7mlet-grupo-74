@@ -175,6 +175,11 @@ docker compose up --build
 | 🧾 **Log auditável de decisões** | `Get-Content artifacts\decisions\audit.jsonl -Tail 5` | terminal |
 | 📓 **Notebook de EDA** | `jupyter lab notebooks\01_eda.ipynb` | navegador |
 
+> 📈 **No MLflow, use a aba `Model training`** (topo, ao lado de `GenAI`) para ver os
+> runs, métricas e a comparação de políticas. A visão `GenAI` (Overview/Traces) é de
+> LLM e exige backend SQL — fica vazia com o *file store*, o que é esperado.
+> A UI leva ~10–15 s para subir; espere aparecer `Uvicorn running` no terminal.
+
 **Testar a API com PowerShell** (com o `serve` rodando em outra janela):
 
 ```powershell
