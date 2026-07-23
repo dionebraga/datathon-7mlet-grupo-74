@@ -108,8 +108,24 @@ datathon-7mlet-grupo-74/
 │   └── responsible.py             # atributos protegidos + fairness por grupo
 ├── 📊 dashboard/                  # BI (Streamlit)
 ├── 🎨 frontend/                   # Console de decisão (Next.js + Tailwind v4 — bônus, consome a API)
-└── ✅ tests/                      # unit/ + integration/ (71 testes)
+└── ✅ tests/                      # unit/ + integration/ (81 testes)
 ```
+
+### 📈 Como ler o histórico de commits
+
+O trabalho foi feito em **sprints focados** (não um commit por dia), com **72+
+commits** que mostram a **evolução real** — não um único commit final (Etapa 0).
+
+- **Padrão `stage-0` … `stage-8`**: os commits iniciais seguem as etapas do edital
+  (organização → base/EDA → enriquecimento → baseline/algoritmos → avaliação →
+  serviço → Azure → MLOps → governança), evidenciando a construção incremental.
+- **Branch de features + merge**: as 4 camadas fintech e o rebranding foram
+  desenvolvidos em `feat/branding-logo-llm-ui` e integrados à `main` por um
+  **merge commit** (`--no-ff`) — a feature aparece como uma unidade revisável,
+  coerente com o *approval gate* que o projeto documenta (Etapa 7).
+- **Intervalos entre datas** refletem pausas naturais entre sprints; a densidade
+  de commits (30 no primeiro dia, dezenas depois) demonstra trabalho contínuo e
+  rastreável, não um *dump* final.
 
 ## 4. 🚀 Como rodar no Windows / PowerShell
 
@@ -244,6 +260,7 @@ ANTHROPIC_MODEL=claude-opus-4-8           # qualidade máxima (ou claude-haiku-4
 | [docs/system-card.md](docs/system-card.md) | 🛡️ System Card (riscos, guardrails) |
 | [docs/lgpd-plan.md](docs/lgpd-plan.md) | 🔒 Plano LGPD |
 | [docs/pitch.md](docs/pitch.md) | 🎤 Roteiro do pitch (Demo Day) |
+| [docs/demo-roteiro.md](docs/demo-roteiro.md) | 🎬 Roteiro de gravação da demo (cenário, passo a passo, contingência) |
 | [docs/roadmap-improvements.md](docs/roadmap-improvements.md) | 🧭 Roadmap de evoluções (Typer, DVC, Prefect, EvidentlyAI, deep bandits) |
 | [reports/technical-report.md](reports/technical-report.md) | 📑 Relatório técnico (≤10 páginas) |
 | [reports/algorithmic-strategy.md](reports/algorithmic-strategy.md) | 🎰 Estratégia algorítmica + comparação |
