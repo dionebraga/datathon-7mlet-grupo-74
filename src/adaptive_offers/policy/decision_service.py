@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from adaptive_offers.bandits.base import Policy
+from adaptive_offers.channels import DEFAULT_CONTACT_POLICY
 from adaptive_offers.config import get_settings
 from adaptive_offers.data.synthetic import (
     OfferArm,
@@ -24,8 +25,11 @@ from adaptive_offers.data.synthetic import (
 )
 from adaptive_offers.feature_store.store import FeatureStore
 from adaptive_offers.logging_utils import get_logger, utc_now_iso
+from adaptive_offers.nba import next_best_action
 from adaptive_offers.policy.reason_codes import enrich
 from adaptive_offers.policy.versioning import PolicyMetadata, load_policy
+from adaptive_offers.responsible import protected_groups
+from adaptive_offers.segmentation import segment_of
 
 logger = get_logger("policy.decision_service")
 
@@ -50,6 +54,16 @@ class DecisionRecord:
     reason_codes: list[str]
     reasons: list[dict[str, str]] = field(default_factory=list)
     estimates: dict[str, float] = field(default_factory=dict)
+    scores: dict[str, float] = field(default_factory=dict)
+    segment_id: str = ""
+    segment_label: str = ""
+    channel_id: str = ""
+    channel_label: str = ""
+    nba_action: str = ""
+    nba_headline: str = ""
+    nba_message: str = ""
+    nba_cta: str = ""
+    protected_groups: dict[str, str] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -105,6 +119,26 @@ class DecisionService:
 
         arm = self.by_id[decision.arm_id]
         exp_rew = expected_reward(arm, ctx_vec)
+        seg = segment_of(features)
+
+        # Channel orchestration: the bandit picked *what* to offer; the contact
+        # policy decides *where/whether* to deliver it. The control arm (no offer)
+        # has nothing to deliver, so contact is suppressed by construction.
+        if arm.offer_id == CONTROL_ARM:
+            channel, ch_codes = None, ["CONTACT_SUPPRESSED"]
+        else:
+            # High-value / complex products (margin >= R$150: e.g. Seguro Bundle,
+            # Fundo, Crédito) warrant a rich-creative channel.
+            channel, ch_codes = DEFAULT_CONTACT_POLICY.select(
+                features, offer_rich=float(arm.margin) >= 150.0
+            )
+        codes.extend(ch_codes)
+
+        # Next-Best-Action: offer -> governed message + concrete next step.
+        nba = next_best_action(arm.offer_id, seg.seg_id, channel.channel_id if channel else "")
+        if arm.offer_id != CONTROL_ARM:
+            codes.append("NBA_GENERATED")
+
         self._counter += 1
         record = DecisionRecord(
             decision_id=f"dec_{self._counter:08d}",
@@ -121,6 +155,16 @@ class DecisionService:
             reason_codes=codes,
             reasons=enrich(codes),
             estimates={k: round(float(v), 4) for k, v in decision.estimates.items()},
+            scores={k: round(float(v), 4) for k, v in (decision.scores or {}).items()},
+            segment_id=seg.seg_id,
+            segment_label=seg.label,
+            channel_id=channel.channel_id if channel else "",
+            channel_label=channel.label if channel else "—",
+            nba_action=nba.action_code,
+            nba_headline=nba.headline,
+            nba_message=nba.message,
+            nba_cta=nba.cta,
+            protected_groups=protected_groups(features),
         )
         if log:
             self._audit(record)

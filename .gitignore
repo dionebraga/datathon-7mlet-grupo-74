@@ -76,3 +76,13 @@ desktop.ini
 .idea/
 .vscode/
 *.swp
+
+# ---- caracol bake debug artifacts (regenerated; never versioned) ----
+.hero-baked.jpg
+_mask*.jpg
+_bake.png
+frontend/public/_bake.png
+*.pptx.bak-*
+
+# Office lock/temp files
+~$*
