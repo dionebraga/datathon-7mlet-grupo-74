@@ -83,3 +83,6 @@ _mask*.jpg
 _bake.png
 frontend/public/_bake.png
 *.pptx.bak-*
+
+# Office lock/temp files
+~$*
