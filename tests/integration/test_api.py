@@ -59,4 +59,6 @@ def test_assistant_explain(client):
     assert r.status_code == 200
     body = r.json()
     assert body["answer"]
-    assert body["provider"] in {"offline", "anthropic"}
+    # Provider can be the deterministic offline engine ("análise ML") or a real
+    # LLM when configured (anthropic / azure_openai).
+    assert body["provider"] in {"offline", "análise ML", "anthropic", "azure_openai"}

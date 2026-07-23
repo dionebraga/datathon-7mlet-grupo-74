@@ -562,6 +562,14 @@ st.markdown(
       .side-svc .svc-name {{font-size:.92rem;font-weight:700;color:{TEXT};}}
       .side-svc .svc-cmd {{font-size:.72rem;color:{MUTED};font-family:monospace;
         display:block;margin-top:2px;overflow-wrap:anywhere;}}
+      /* ── Spinner (carga inicial) — caixa escura, combina com o tema ── */
+      [data-testid="stSpinner"], .stSpinner {{
+        background:rgba(8,10,20,.92) !important; backdrop-filter:blur(8px);
+        border:1px solid {hex_rgba(CYAN,.30)} !important; border-radius:12px !important;
+        padding:14px 18px !important; box-shadow:0 8px 30px rgba(0,0,0,.55) !important;}}
+      [data-testid="stSpinner"] p, .stSpinner p,
+      [data-testid="stSpinner"] div, .stSpinner div {{
+        color:{TEXT} !important; font-weight:600 !important;}}
       /* ── Expander (rastreio de execução) — card escuro coeso ──── */
       [data-testid="stExpander"] {{
         background:rgba(0,0,0,0.55) !important;
@@ -772,7 +780,7 @@ st.markdown(
 # --------------------------------------------------------------------------- #
 # Experiment (cached)
 # --------------------------------------------------------------------------- #
-@st.cache_resource(show_spinner="🛰️ Preparando o experimento (treino das 5 políticas) — só nesta primeira carga, fica em cache depois…")
+@st.cache_resource(show_spinner="⚙️ Rodando a simulação real das 5 políticas sobre a base UCI (41.188 contatos)…")
 def load_experiment(horizon: int, seed: int):
     proc_path = ROOT / "data" / "processed" / "bank_marketing_processed.parquet"
     needs_build = not proc_path.exists()
