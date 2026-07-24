@@ -107,6 +107,7 @@ class Settings:
     anthropic_model: str = field(
         default_factory=lambda: _env("ANTHROPIC_MODEL", "claude-opus-4-8")
     )
+    llm_timeout_s: float = field(default_factory=lambda: _env_float("LLM_TIMEOUT_S", 12.0))
 
     api_host: str = field(default_factory=lambda: _env("API_HOST", "0.0.0.0"))
     api_port: int = field(default_factory=lambda: _env_int("API_PORT", 8000))

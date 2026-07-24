@@ -27,6 +27,7 @@ class LLMClient:
         settings = get_settings()
         self.provider = (provider or settings.llm_provider or "offline").lower()
         self.model = settings.anthropic_model
+        self.timeout_s = settings.llm_timeout_s
         if self.provider == "anthropic" and not os.environ.get("ANTHROPIC_API_KEY"):
             logger.info('{"event": "llm_fallback", "reason": "missing ANTHROPIC_API_KEY"}')
             self.provider = "offline"
@@ -36,6 +37,8 @@ class LLMClient:
             try:
                 return self._anthropic(prompt, system)
             except Exception as exc:  # pragma: no cover - network/optional dep
+                # A slow/hung network call must never freeze the UI for minutes —
+                # bounded by ``timeout_s`` (see __init__), then falls back here.
                 logger.info('{"event": "llm_error", "provider": "anthropic", "err": "%s"}', exc)
                 return self._offline(prompt, grounding)
         return self._offline(prompt, grounding)
@@ -44,7 +47,7 @@ class LLMClient:
     def _anthropic(self, prompt: str, system: str) -> str:  # pragma: no cover - optional
         import anthropic  # type: ignore
 
-        client = anthropic.Anthropic()
+        client = anthropic.Anthropic(timeout=self.timeout_s, max_retries=0)
         msg = client.messages.create(
             model=self.model,
             max_tokens=600,
