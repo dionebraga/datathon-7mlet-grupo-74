@@ -479,16 +479,22 @@ st.markdown(
             #000 42%, rgba(0,0,0,.5) 66%, transparent 84%) 50% 47% / 0% 0% no-repeat;
         mask:radial-gradient(circle at 50% 47%,
             #000 42%, rgba(0,0,0,.5) 66%, transparent 84%) 50% 47% / 0% 0% no-repeat;
-        animation:heroGrow 2.8s cubic-bezier(.2,.7,.2,1) both,
-                  heroDrift 46s ease-in-out 2.8s infinite alternate;}}
+        animation:heroGrow 4.2s cubic-bezier(.16,.8,.24,1) both,
+                  heroDrift 46s ease-in-out 4.2s infinite alternate;}}
       /* conteúdo sempre ACIMA do fundo (fórmulas já estão assadas na foto, então
          elas se movem JUNTO com a imagem) */
       [data-testid="stMain"], [data-testid="stSidebar"],
       [data-testid="stHeader"] {{position:relative; z-index:1;}}
+      /* Surge ao carregar a página (F5 / primeira abertura) — mais longa e com
+         um leve "respiro" de brilho no meio antes de assentar na deriva contínua.
+         Só dispara em reload de verdade: cliques/reruns do Streamlit não recriam
+         este elemento, então não repetem a animação (comportamento normal de SPA). */
       @keyframes heroGrow {{
-        0%   {{opacity:0;   transform:scale(1.04);
+        0%   {{opacity:0;   transform:scale(1.02);
                -webkit-mask-size:0% 0%; mask-size:0% 0%;}}
-        60%  {{opacity:.46;}}
+        45%  {{opacity:.56; transform:scale(1.05);
+               -webkit-mask-size:220% 220%; mask-size:220% 220%;}}
+        72%  {{opacity:.40;}}
         100% {{opacity:.46; transform:scale(1.06);
                -webkit-mask-size:340% 340%; mask-size:340% 340%;}}}}
       @keyframes heroDrift {{
@@ -1778,10 +1784,10 @@ def p_policy_heatmap(title: str) -> go.Figure:
         for m in met:
             v = row[m]
             if m == "reward_per_1k":
-                # Abbreviated (12.3k, not 12,250) — the cell is ~1/4 of the
-                # dashboard width, and the full number crowds against its
-                # neighbours; the exact value is still in the hover tooltip.
-                row_txt.append(f"R${v/1000:.1f}k")
+                # Abbreviated (12.3k, not R$12,250) — the "R$" is redundant
+                # with the "R$/1k" column header and costs two characters the
+                # narrow cell can't spare; the exact value is in the hover.
+                row_txt.append(f"{v/1000:.1f}k")
             elif m == "lift_vs_baseline_pct":
                 row_txt.append(f"{v:+.0f}%")
             else:
@@ -2133,11 +2139,13 @@ st.markdown(
     '<b>Heatmap multi-métrica</b>: intensidade de cor = posição relativa normalizada 0–100 entre políticas; valor exato dentro de cada célula.</div>',
     unsafe_allow_html=True,
 )
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4 = st.columns([1, 1, 1, 2])
 c1.plotly_chart(p_lift_curve("📈 Lift cumulativo vs baseline"), config=NO_BAR, **fill())
 c2.plotly_chart(p_window_regret("⚡ Regret por janela (convergência)"), config=NO_BAR, **fill())
 c3.plotly_chart(p_lollipop("exploration_rate", "🔍 Taxa de exploração",
                             ref_zone=(0.10, 0.20), ref_label="zona ideal"), config=NO_BAR, **fill())
+# Heatmap gets ~2x the width of the others: 5 metrics x policies of exact-value
+# text genuinely needs more room than a 1-of-4 equal column ever gives it.
 c4.plotly_chart(p_policy_heatmap("🔢 Comparação multi-métrica"), config=NO_BAR, **fill())
 
 # Segunda linha — dinâmica temporal do aprendizado (exploração e convergência)
