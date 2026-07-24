@@ -260,8 +260,6 @@ ANTHROPIC_MODEL=claude-opus-4-8           # qualidade máxima (ou claude-haiku-4
 | [docs/model-card.md](docs/model-card.md) | 🪪 Model Card |
 | [docs/system-card.md](docs/system-card.md) | 🛡️ System Card (riscos, guardrails) |
 | [docs/lgpd-plan.md](docs/lgpd-plan.md) | 🔒 Plano LGPD |
-| [docs/pitch.md](docs/pitch.md) | 🎤 Roteiro do pitch (Demo Day) |
-| [docs/demo-roteiro.md](docs/demo-roteiro.md) | 🎬 Roteiro de gravação da demo (cenário, passo a passo, contingência) |
 | [docs/roadmap-improvements.md](docs/roadmap-improvements.md) | 🧭 Roadmap de evoluções (Typer, DVC, Prefect, EvidentlyAI, deep bandits) |
 | [reports/technical-report.md](reports/technical-report.md) | 📑 Relatório técnico (≤10 páginas) |
 | [reports/algorithmic-strategy.md](reports/algorithmic-strategy.md) | 🎰 Estratégia algorítmica + comparação |

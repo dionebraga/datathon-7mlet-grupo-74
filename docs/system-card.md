@@ -60,6 +60,9 @@ sequenceDiagram
 ## 6. Plano de monitoramento
 - **Drift** (PSI/KS) de features e *score* — alerta em PSI ≥ 0,25.
 - **Reward/conversão** — *control chart* (z < −3 → rollback/review).
+- **Off-policy (Doubly Robust)** — antes de promover, o valor da candidata é
+  reavaliado só com eventos logados (`adaptive-offers ope`); promove apenas se o
+  limite inferior do IC95 do DR superar a versão ativa (ver `mlops-lifecycle.md`).
 - **Fairness** — disparidade de **exposição** e de **valor** (margem média) por
   grupo protegido; flag `review` se exposição > 0,25 ou valor > 0,30.
 - **Operacional** — latência, erro 4xx/5xx, saúde do feature store (`/health`).

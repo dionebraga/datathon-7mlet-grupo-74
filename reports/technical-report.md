@@ -107,6 +107,22 @@ reward médio **110.046**, vence **3/5**, e é **o mais estável (CV 2,97%)**, c
 Thompson (105.512; CV 7,07%; 2/5), Nilos-UCB (99.800; 0/5) e Baseline (87.616; CV
 **20,2%** — instável, o que explica por que numa seed isolada ele parece forte).
 
+**Validação independente — off-policy (Doubly Robust)**: sem depender da simulação
+on-policy, reavaliamos cada política **só com os eventos já logados**
+(propensity + `evaluation/ope.py`). O ranking off-policy **confirma** o on-policy:
+
+| Política | DR (valor/impressão) | IC95 (bootstrap) | Δ variância vs IPS |
+|---|---:|---|---:|
+| **LinUCB** | **19,18** | [17,66 · 20,65] | **−8,1%** |
+| Thompson | 16,91 | [15,07 · 18,49] | −6,4% |
+| Baseline | 16,44 | [14,69 · 18,06] | −6,3% |
+| Nilos-UCB | 10,47 | [9,37 · 11,55] | −6,2% |
+
+O **gate de promoção A/B-free** (`adaptive-offers ope`) promove uma candidata só
+se o **limite inferior do IC95 do DR** superar o valor da incumbente — aqui, o
+LinUCB (17,66) supera o baseline (16,44) → **promoção aprovada**. Detalhe em
+`reports/offline-evaluation.md` §5.
+
 **Evidências adicionais** (`reports/offline-evaluation.md`):
 - **Golden set** (24 casos): **83,3%** (5/8 típicos, **6/6 segmento**, 4/5 borda,
   **5/5 adversariais**) — segmento e adversarial seguem em 100%.
@@ -164,7 +180,6 @@ Privacidade e atributos protegidos em `docs/lgpd-plan.md`.
 
 ## 11. Trabalhos futuros
 - LinUCB com features cruzadas/kernels; Neural/Deep bandits (PyTorch).
-- Off-policy evaluation mais robusta (Doubly Robust).
 - *Drift* não-estacionário no simulador; *contextual* fairness constraints.
 - Integração real com Azure OpenAI/AI Search e Feast no lugar do store próprio.
 
