@@ -806,6 +806,34 @@ def load_experiment(horizon: int, seed: int):
     return processed, bundle, results
 
 
+@st.cache_data(show_spinner=False)
+def _ope_table(horizon: int, seed: int):
+    """Doubly-Robust off-policy value per policy + promotion gate (lazy/cached).
+
+    Reuses the cached experiment (processed + bundle), fits a shared reward model
+    and scores each policy off-policy from the logged events. Returns plain dicts
+    so the result is cache-serialisable."""
+    from adaptive_offers.evaluation.ope import (
+        doubly_robust,
+        fit_reward_model,
+        promotion_gate,
+    )
+
+    processed, bundle, _ = load_experiment(horizon, seed)
+    arms = build_arms(bundle.catalog)
+    rm = fit_reward_model(bundle.events, bundle.contexts)
+    pols, rows = {}, []
+    for name in ("linucb", "thompson", "baseline", "nilos_ucb"):
+        pol = build_policy(name, arms, context_dim=len(CONTEXT_FEATURES), seed=seed)
+        run_simulation(pol, processed, bundle, horizon=horizon, seed=seed)
+        pols[name] = pol
+        rows.append(doubly_robust(pol, processed, bundle, reward_model=rm,
+                                  n_boot=300, seed=seed))
+    gate = promotion_gate(pols["linucb"], pols["baseline"], processed, bundle,
+                          n_boot=300, seed=seed)
+    return rows, gate
+
+
 def downsample(arr, points: int = 48):
     a = np.asarray(arr, dtype=float)
     if len(a) <= points:
@@ -1954,6 +1982,66 @@ st.markdown(
     'janela — sobe e converge conforme o bandit refina a seleção (forma distinta do cumulativo).</div>',
     unsafe_allow_html=True,
 )
+
+# --- Off-policy evaluation (Doubly Robust) — lazy, on demand --------------- #
+st.markdown('<div class="sect">🔬 Avaliação off-policy — Doubly Robust (DR-OPE)</div>',
+            unsafe_allow_html=True)
+st.markdown(
+    '<div class="sect-desc">Estima o valor de cada política <b>a partir dos eventos '
+    'logados</b> (com propensity) — <b>sem expor clientes / sem A/B</b>. '
+    '<b>DR</b> = modelo de recompensa + correção IPS, com <b>IC95 bootstrap</b>. '
+    'O <b>gate de promoção</b> só aprova se o limite inferior do DR da candidata superar a incumbente.</div>',
+    unsafe_allow_html=True,
+)
+if st.button("▶ Rodar DR-OPE (off-policy)", key="run_ope", **fill()):
+    with st.spinner("Calculando DR-OPE (bootstrap) — reusa o experimento em cache…"):
+        _ope_rows, _gate = _ope_table(int(horizon), int(seed))
+    _ope_rows = sorted(_ope_rows, key=lambda r: r["v_dr"], reverse=True)
+    _rows_html = ""
+    for r in _ope_rows:
+        lbl = POLICY_LABEL.get(r["policy"], r["policy"])
+        top = r["policy"] == _ope_rows[0]["policy"]
+        cor = GREEN if top else TEXT
+        lo, hi = r["v_dr_ci"]
+        _rows_html += (
+            f'<tr style="border-bottom:1px solid rgba(255,255,255,.05)">'
+            f'<td style="padding:7px 10px;font-size:.82rem;color:{cor};font-weight:{"800" if top else "600"}">'
+            f'{"⭐ " if top else ""}{lbl}</td>'
+            f'<td style="padding:7px 8px;text-align:right;font-size:.86rem;color:{cor};font-weight:800">'
+            f'R$ {r["v_dr"]:.2f}</td>'
+            f'<td style="padding:7px 8px;text-align:right;font-size:.78rem;color:{MUTED}">'
+            f'[{lo:.1f} · {hi:.1f}]</td>'
+            f'<td style="padding:7px 8px;text-align:right;font-size:.78rem;color:{CYAN}">{r["v_ips"]:.2f}</td>'
+            f'<td style="padding:7px 8px;text-align:right;font-size:.78rem;color:{GOLD}">{r["v_dm"]:.2f}</td>'
+            f'<td style="padding:7px 8px;text-align:right;font-size:.78rem;color:{GREEN}">−{r["var_reduction_vs_ips"]*100:.0f}%</td>'
+            f'</tr>'
+        )
+    _passed = _gate["passed"]
+    _gcol = GREEN if _passed else AMBER
+    _gtxt = "✅ PROMOVER" if _passed else "⛔ SEGURAR"
+    st.markdown(
+        f'<div style="background:rgba(0,0,0,0.72);backdrop-filter:blur(12px);border-radius:12px;'
+        f'padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.55),0 4px 14px rgba(0,0,0,.38)">'
+        f'<table style="width:100%;border-collapse:collapse">'
+        f'<thead><tr style="border-bottom:1px solid {GRID}">'
+        f'<th style="padding:6px 10px;text-align:left;font-size:.72rem;color:{MUTED};letter-spacing:.05em">POLÍTICA</th>'
+        f'<th style="padding:6px 8px;text-align:right;font-size:.72rem;color:{MUTED}">DR (R$)</th>'
+        f'<th style="padding:6px 8px;text-align:right;font-size:.72rem;color:{MUTED}">IC95 DR</th>'
+        f'<th style="padding:6px 8px;text-align:right;font-size:.72rem;color:{MUTED}">IPS</th>'
+        f'<th style="padding:6px 8px;text-align:right;font-size:.72rem;color:{MUTED}">DM</th>'
+        f'<th style="padding:6px 8px;text-align:right;font-size:.72rem;color:{MUTED}">Δvar vs IPS</th>'
+        f'</tr></thead><tbody>{_rows_html}</tbody></table>'
+        f'<div style="margin-top:12px;padding-top:11px;border-top:1px solid {GRID};'
+        f'display:flex;align-items:center;gap:10px">'
+        f'<span style="background:{hex_rgba(_gcol,.16)};color:{_gcol};border:1px solid {hex_rgba(_gcol,.4)};'
+        f'border-radius:7px;padding:4px 12px;font-weight:800;font-size:.82rem">{_gtxt}</span>'
+        f'<span style="color:{MUTED};font-size:.82rem">Gate: DR_inf(LinUCB) '
+        f'<b style="color:{TEXT}">{_gate["candidate_dr_lower"]:.2f}</b> '
+        f'{"≥" if _passed else "&lt;"} DR(Baseline) '
+        f'<b style="color:{TEXT}">{_gate["incumbent_dr"]:.2f}</b></span>'
+        f'</div></div>',
+        unsafe_allow_html=True,
+    )
 
 # --- Grid row C: ML learning dynamics -------------------------------------- #
 st.markdown('<div class="sect">🧠 Dinâmica de aprendizado do modelo</div>', unsafe_allow_html=True)

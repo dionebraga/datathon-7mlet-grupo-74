@@ -65,14 +65,36 @@ O **LinUCB** é o mais **estável** (menor CV) e vence na maioria das seeds; o
 **baseline é instável** (CV ~20%) — por isso numa execução isolada ele às vezes
 parece competitivo. A liderança do LinUCB **não é artefato de uma única seed**.
 
-## 5. Validação off-policy (IPS / SNIPS)
+## 5. Validação off-policy — Doubly Robust (DR-OPE)
 
-A metodologia (estimadores *Inverse Propensity Scoring* sobre os eventos logados,
-com as propensities registradas no Stage 2) permanece implementada e válida.
+Estimamos o valor de cada política **a partir dos eventos logados** (com
+`propensity` do Stage 2), **sem A/B**, combinando três estimadores
+(`evaluation/ope.py`): **IPS/SNIPS**, **Direct Method** (modelo de recompensa
+`Q̂(x,a)`) e **Doubly Robust** — consistente se o modelo OU as propensities
+estiverem corretos, com **menor variância que o IPS** e **IC95 por bootstrap**.
 
-> ⚠️ **Pendente de recomputação na base real.** Os valores absolutos de IPS/SNIPS
-> aqui exibidos eram do fac-símile e foram **removidos** para não induzir a erro.
-> Rode `adaptive-offers evaluate` para os números atuais.
+**Base real (UCI · 41.188 eventos · política congelada em 6.000 rounds · seed=123):**
+
+| Política | DR (valor/impressão) | IC95 (DR) | IPS | DM | Redução de variância vs IPS | Match |
+|---|---:|---|---:|---:|---:|---:|
+| **LinUCB** | **19,18** | **[17,66 · 20,65]** | 18,86 | 19,01 | **8,1%** | 17,9% |
+| Thompson | 16,91 | [15,07 · 18,49] | 16,88 | 16,74 | 6,4% | 15,7% |
+| Baseline | 16,44 | [14,69 · 18,06] | 16,43 | 16,52 | 6,3% | 14,7% |
+| Nilos-UCB | 10,47 | [9,37 · 11,55] | 10,45 | 10,60 | 6,2% | 14,7% |
+
+- **O off-policy confirma o on-policy**: o ranking DR (LinUCB > Thompson >
+  Baseline > Nilos-UCB) reproduz o da simulação — evidência independente de que o
+  LinUCB é o melhor, medida sem expor clientes.
+- **Gate de promoção** (`adaptive-offers ope`): o **limite inferior do IC95 do DR
+  do LinUCB (17,66)** supera o **DR pontual do baseline (16,44)** → **PROMOVER**.
+  Sob baixa sobreposição, o gate **segura** — comportamento conservador e honesto.
+- **Sobreposição limitada** (match 15–18%): a política-alvo concorda com a
+  logging-policy (ε-exploração) em poucos eventos, o que **alarga os IC** — por
+  isso reportamos IC e usamos o **limite inferior**, não o valor pontual.
+
+```powershell
+adaptive-offers ope --policy linucb --incumbent baseline   # DR-OPE + IC + gate
+```
 
 ## 6. Fairness de exposição entre segmentos
 

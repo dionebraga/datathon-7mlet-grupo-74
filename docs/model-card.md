@@ -26,6 +26,7 @@
 | Regret ratio | **8,3%** | 10,9% |
 | Conversão | **9,1%** | 6,2% |
 | Lift de valor (seed 123) | +8,2% | — |
+| **DR-OPE** (Doubly Robust, valor/impressão) | **19,18** · IC95 [17,66 · 20,65] | 16,44 |
 | Golden set pass-rate | **83,3%** (adversarial 5/5) | — |
 | Estabilidade (CV reward, 5 seeds) | **2,97%** | 20,2% |
 | Fairness — disparidade de exposição (grupos protegidos) | **0,00** | — |

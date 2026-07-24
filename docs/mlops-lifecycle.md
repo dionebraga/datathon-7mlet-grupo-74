@@ -9,8 +9,8 @@
 ```mermaid
 flowchart LR
     H[Nova hipótese\noferta/canal/mensagem] --> T[Treino\nrun_simulation + seeds]
-    T --> E[Avaliação offline\ngolden set + métricas + fairness]
-    E --> R{Approval gate\nhumano}
+    T --> E[Avaliação offline\ngolden set + métricas + fairness\n+ DR-OPE com IC]
+    E --> R{Approval gate\nhumano\nDR-OPE lower bound}
     R -- reprovado --> H
     R -- aprovado --> P[Promoção\nversion ativo]
     P --> C[Canary 10%]
@@ -41,6 +41,7 @@ Uma política só é promovida se **todos** os critérios passarem:
 
 | Critério | Limite |
 |---|---|
+| **OPE — Doubly Robust (limite inferior IC95)** | **≥ valor DR da versão ativa** (evidência *A/B-free*) |
 | Golden set pass-rate | ≥ 0,95 e **100% dos casos adversariais** |
 | Lift de valor vs versão ativa | ≥ 0 (não regredir) |
 | Regret ratio | ≤ regret da versão ativa |
@@ -51,10 +52,32 @@ Uma política só é promovida se **todos** os critérios passarem:
 
 O *gate* é **humano no loop**: a automação calcula evidências; uma pessoa aprova.
 
+### 4.1 Avaliação off-policy (Doubly Robust) — o critério central
+
+Antes de expor clientes, medimos o valor da política candidata **a partir dos
+eventos já logados** (com `propensity`), sem A/B. Combinamos três estimadores em
+`evaluation/ope.py`:
+
+- **IPS/SNIPS** — reward ponderado por importância (não-viesado, alta variância).
+- **Direct Method (DM)** — modelo de recompensa `Q̂(x,a)` (baixa variância, viesado).
+- **Doubly Robust (DR)** — `Q̂(x,π(x)) + 1{π(x)=a}/p·(r − Q̂(x,a))`: **consistente se
+  o modelo de recompensa OU as propensities estiverem corretos**, com **menor
+  variância que o IPS**. **Intervalo de confiança por bootstrap** quantifica a
+  incerteza.
+
+`promotion_gate()` promove **só se o limite inferior do IC95 do DR da candidata
+superar o DR pontual da incumbente** — decisão estatisticamente honesta e
+conservadora (não promove sob baixa sobreposição). Referências: Dudík, Langford &
+Li (2011); Jiang & Li (2016).
+
+```powershell
+adaptive-offers ope --policy linucb --incumbent baseline   # IPS/SNIPS/DM/DR + IC + gate
+```
+
 ## 5. Procedimento de promoção (controlado)
 
-1. Treinar candidato `vN` e avaliar (`evaluate`) — evidências em `artifacts/`.
-2. Revisor confere golden set, lift, fairness e o **model card**.
+1. Treinar candidato `vN` e avaliar (`evaluate` + **`ope`** para o DR-OPE).
+2. Revisor confere **DR-OPE (IC)**, golden set, lift, fairness e o **model card**.
 3. Aprovação registrada → `promote("vN")`.
 4. **Canary** 10% (revision split no Container App) com monitoramento ativo.
 5. Saudável por janela definida → 100%. Alerta → `rollback()` automático.

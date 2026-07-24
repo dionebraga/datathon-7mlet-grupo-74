@@ -211,6 +211,48 @@ def evaluate(horizon: int, seed: int | None) -> None:
     click.echo(f"[ok] drift/fairness HTML -> {drift_path}")
 
 
+@cli.command("ope")
+@click.option("--policy", "policy_name", default="linucb", show_default=True,
+              type=click.Choice(["baseline", "thompson", "nilos_ucb", "linucb", "lin_thompson"]),
+              help="Política CANDIDATA a avaliar off-policy.")
+@click.option("--incumbent", default="baseline", show_default=True,
+              type=click.Choice(["baseline", "thompson", "nilos_ucb", "linucb", "lin_thompson"]),
+              help="Política atual (referência do gate de promoção).")
+@click.option("--horizon", default=12_000, show_default=True)
+@click.option("--seed", default=None, type=int)
+def ope(policy_name: str, incumbent: str, horizon: int, seed: int | None) -> None:
+    """Avaliação OFF-POLICY (Doubly Robust) — vale a nova política SEM implantar.
+
+    Estima o valor da política candidata a partir dos eventos logados (com
+    propensity), via IPS/SNIPS/Direct-Method/DR + IC bootstrap, e aplica o gate de
+    promoção (promove só se o limite inferior do DR superar a incumbente).
+    """
+    from adaptive_offers.bootstrap import ensure_bundle, ensure_data
+    from adaptive_offers.evaluation.offline_eval import train_frozen_policy
+    from adaptive_offers.evaluation.ope import doubly_robust, promotion_gate
+
+    proc = ensure_data(seed=seed)
+    bundle = ensure_bundle(proc, seed=seed)
+    cand = train_frozen_policy(policy_name, proc, bundle, horizon=horizon, seed=seed)
+    inc = train_frozen_policy(incumbent, proc, bundle, horizon=horizon, seed=seed)
+
+    dr = doubly_robust(cand, proc, bundle, seed=seed or 0)
+    click.echo(f"\n=== OPE (Doubly Robust) — candidata: {policy_name} ===")
+    click.echo(f"  IPS   : {dr['v_ips']:>7}  IC95 {dr['v_ips_ci']}")
+    click.echo(f"  SNIPS : {dr['v_snips']:>7}")
+    click.echo(f"  DM    : {dr['v_dm']:>7}")
+    click.echo(f"  DR    : {dr['v_dr']:>7}  IC95 {dr['v_dr_ci']}  "
+               f"(variância {dr['var_reduction_vs_ips']:.1%} menor que IPS)")
+    click.echo(f"  match_rate={dr['match_rate']} · ESS={dr['effective_sample']} "
+               f"· n={dr['n_events']}")
+
+    gate = promotion_gate(cand, inc, proc, bundle, seed=seed or 0)
+    mark = "✅ PROMOVER" if gate["passed"] else "⛔ SEGURAR"
+    click.echo(f"\n=== Gate de promoção (vs {incumbent}) ===")
+    click.echo(f"  {mark}: DR_lower(cand)={gate['candidate_dr_lower']} "
+               f"{'>=' if gate['passed'] else '<'} DR(incumbente)={gate['incumbent_dr']}")
+
+
 # --------------------------------------------------------------------------- #
 # Stages 1-4 — pipeline
 # --------------------------------------------------------------------------- #
