@@ -12,7 +12,9 @@ from __future__ import annotations
 
 import json
 import socket
+import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -49,6 +51,38 @@ def port_open(port: int, host: str = "127.0.0.1") -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.settimeout(0.2)
         return s.connect_ex((host, port)) == 0
+
+
+@st.cache_resource(show_spinner=False)
+def build_marker() -> str:
+    """Short git commit + this file's mtime + when THIS process first started.
+
+    Streamlit re-executes this script top-to-bottom on every rerun (button
+    click, slider drag) inside the SAME long-running process — so this must be
+    cached, or "processo iniciado" would show the current time on every rerun
+    instead of when the process actually launched. Shown in the footer so a
+    stale/zombie ``streamlit run`` (old code still resident in memory, never
+    restarted after a code change on disk) is instantly obvious by comparing
+    the commit/timestamp shown against ``git log`` — no need to eyeball the UI
+    for subtle visual differences.
+    """
+    commit = "sem git"
+    try:
+        commit = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True,
+            text=True, timeout=2,
+        ).stdout.strip() or "sem git"
+    except Exception:
+        pass
+    try:
+        mtime = datetime.fromtimestamp(Path(__file__).stat().st_mtime).strftime("%d/%m %H:%M")
+    except Exception:
+        mtime = "?"
+    started = datetime.now().strftime("%d/%m %H:%M:%S")
+    return f"commit {commit} · arquivo editado {mtime} · processo iniciado {started}"
+
+
+BUILD_MARKER = build_marker()
 
 
 def hex_rgba(hex_color: str, alpha: float) -> str:
@@ -1199,6 +1233,13 @@ with st.sidebar:
         f'<div style="font-size:.72rem;color:{CYAN};font-weight:700;letter-spacing:.16em;'
         f'text-transform:uppercase;margin-top:3px">FIAP 7MLET · Grupo 74</div>'
         f'</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<div style="font-size:.64rem;color:{hex_rgba(TEXT,.45)};font-family:monospace;'
+        f'margin:2px 0 0;line-height:1.3" title="Se este texto não mudar depois de reiniciar '
+        f'o Streamlit, o processo antigo ainda está rodando (não reiniciou de verdade).">'
+        f'🔧 {BUILD_MARKER}</div>',
         unsafe_allow_html=True,
     )
     st.divider()
@@ -3143,4 +3184,8 @@ st.markdown(
     '<br/><span style="font-size:.82rem">Licença MIT · '
     '<a href="https://github.com/dionebraga/datathon-7mlet-grupo-74" '
     f'style="color:{MUTED};text-decoration:none">github.com/dionebraga/datathon-7mlet-grupo-74</a>'
-    '</span></div>', unsafe_allow_html=True)
+    '</span>'
+    f'<br/><span style="font-size:.72rem;color:{hex_rgba(AMBER,.85)};font-family:monospace">'
+    f'⚠ se esta linha não mudar após reiniciar, o processo antigo ainda está rodando → '
+    f'{BUILD_MARKER}</span>'
+    '</div>', unsafe_allow_html=True)
