@@ -31,13 +31,15 @@ export function MetricCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay, ease: "easeOut" }}
       whileHover={{ y: -4, scale: 1.01 }}
-      className="card p-5 transition-shadow duration-200 hover:shadow-lg hover:shadow-primary/5"
+      className="card p-3.5 transition-shadow duration-200 hover:shadow-lg hover:shadow-primary/5 sm:p-5"
     >
       <div className="flex items-center gap-2" style={{ color }}>
-        <Icon className="h-4 w-4" />
-        <span className="text-[0.72rem] font-bold uppercase tracking-wider text-muted">{label}</span>
+        <Icon className="h-4 w-4 shrink-0" />
+        <span className="text-[0.68rem] font-bold uppercase tracking-wider text-muted sm:text-[0.72rem]">
+          {label}
+        </span>
       </div>
-      <div className="mt-2 text-3xl font-extrabold tracking-tight" style={{ color }}>
+      <div className="mt-2 truncate text-xl font-extrabold tracking-tight sm:text-3xl" style={{ color }}>
         {value}
       </div>
       <div className="mt-1 flex items-center gap-2">

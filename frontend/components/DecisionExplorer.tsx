@@ -117,11 +117,13 @@ export function DecisionExplorer({ offers }: { offers: Offer[] }) {
             className="mt-5 space-y-4"
           >
             {/* headline */}
-            <div className="card flex items-center justify-between p-5">
+            <div className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <div className="flex items-center gap-3">
-                <Gift className="h-7 w-7 text-primary-soft" />
-                <div>
-                  <div className="text-xl font-extrabold text-primary-soft">{decision.arm_name}</div>
+                <Gift className="h-6 w-6 shrink-0 text-primary-soft sm:h-7 sm:w-7" />
+                <div className="min-w-0">
+                  <div className="text-lg font-extrabold text-primary-soft sm:text-xl">
+                    {decision.arm_name}
+                  </div>
                   <div className="mt-0.5 text-xs text-muted">
                     {decision.explored ? "🔍 exploração" : "🎯 explotação"} · política{" "}
                     <b className="text-text">
@@ -131,8 +133,10 @@ export function DecisionExplorer({ offers }: { offers: Offer[] }) {
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-2xl font-extrabold text-success">{brl(decision.expected_reward)}</div>
+              <div className="text-left sm:text-right">
+                <div className="text-xl font-extrabold text-success sm:text-2xl">
+                  {brl(decision.expected_reward)}
+                </div>
                 <div className="text-[0.72rem] text-muted">valor esperado</div>
               </div>
             </div>
@@ -186,23 +190,25 @@ export function DecisionExplorer({ offers }: { offers: Offer[] }) {
                 {decision.estimates && decision.arm_id && (
                   <div className="mt-4 rounded-xl border border-border bg-surface2 p-3 text-center text-xs">
                     <div className="mb-2 text-muted">Valor = P(conv) × Margem</div>
-                    <div className="flex items-center justify-around gap-1">
+                    <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2">
                       <div>
-                        <div className="text-lg font-extrabold text-primary-soft">
+                        <div className="text-base font-extrabold text-primary-soft sm:text-lg">
                           {((decision.estimates[decision.arm_id] ?? 0) / 100).toFixed(1)}%
                         </div>
                         <div className="text-muted">P(conv)</div>
                       </div>
-                      <span className="text-lg text-muted">×</span>
+                      <span className="text-base text-muted sm:text-lg">×</span>
                       <div>
-                        <div className="text-lg font-extrabold text-success">
+                        <div className="text-base font-extrabold text-success sm:text-lg">
                           {brl(decision.expected_reward / Math.max(0.01, (decision.estimates[decision.arm_id] ?? 1) / 100))}
                         </div>
                         <div className="text-muted">Margem</div>
                       </div>
-                      <span className="text-lg text-muted">=</span>
+                      <span className="text-base text-muted sm:text-lg">=</span>
                       <div>
-                        <div className="text-lg font-extrabold text-success">{brl(decision.expected_reward)}</div>
+                        <div className="text-base font-extrabold text-success sm:text-lg">
+                          {brl(decision.expected_reward)}
+                        </div>
                         <div className="text-muted">Valor</div>
                       </div>
                     </div>

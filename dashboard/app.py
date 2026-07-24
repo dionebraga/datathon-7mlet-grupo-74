@@ -771,6 +771,74 @@ st.markdown(
       .rag-score {{font-size:.76rem;font-weight:800;min-width:40px;text-align:right;}}
       .rag-txt {{font-size:.84rem;color:{MUTED};line-height:1.60;}}
       .rag-highlight {{color:{TEXT};font-weight:600;}}
+
+      /* ══════════════════════════════════════════════════════════════
+         RESPONSIVO / MOBILE — breakpoints reais (o app não tinha nenhum
+         além de prefers-reduced-motion). Streamlit já empilha st.columns()
+         e recolhe a sidebar em overlay abaixo de ~576px nativamente; o que
+         falta é a nossa própria tipografia/espaçamento/alvos de toque.
+         ══════════════════════════════════════════════════════════════ */
+
+      /* Tablet (≤1024px) — aperta as margens, sem ainda reformular */
+      @media (max-width:1024px) {{
+        .block-container {{padding-left:1rem;padding-right:1rem;max-width:100%;}}
+        .topbar {{flex-wrap:wrap;gap:10px;}}
+      }}
+
+      /* Phone (≤640px) — reformulação real */
+      @media (max-width:640px) {{
+        html {{font-size:15.5px;}}
+        .block-container {{padding-top:.7rem;padding-left:.6rem;padding-right:.6rem;}}
+        div[data-testid="column"] {{padding:0 4px;}}
+
+        .topbar {{flex-direction:column;align-items:flex-start;padding:12px 14px;
+          border-radius:12px;gap:8px;}}
+        .topbar h1 {{font-size:1.05rem;}}
+        .topbar .sub {{font-size:.76rem;}}
+
+        .sect {{font-size:.72rem;margin:20px 0 10px;letter-spacing:.08em;}}
+        .sect-desc {{font-size:.78rem;line-height:1.5;}}
+
+        .result {{padding:16px 14px;border-radius:14px;}}
+        .result .arm {{font-size:1.15rem;}}
+
+        .pill {{padding:4px 10px;font-size:.70rem;margin:2px 4px 2px 0;}}
+        .stat {{padding:4px 10px;font-size:.70rem;}}
+
+        /* Botões — alvo de toque ≥44px (WCAG 2.5.5 / Apple HIG) */
+        .stButton > button {{min-height:44px;padding:.6rem 1rem;font-size:.92rem;}}
+
+        /* Slider nativo do Streamlit — thumb maior p/ dedo (role="slider" é
+           estável entre versões; testids internos do BaseWeb mudam) */
+        [role="slider"] {{width:22px !important;height:22px !important;}}
+
+        .side-svc {{padding:8px 10px;}}
+        .side-sect {{font-size:.72rem;}}
+        .svc-cmd {{font-size:.68rem;}}
+
+        /* Feed ao vivo — colunas fixas mais estreitas para caber o nome */
+        .tl-item {{grid-template-columns:50px 8px 44px 1fr 52px;gap:6px;padding:8px 0;}}
+        .tl-time {{font-size:10px;}}
+        .tl-badge {{font-size:7px;padding:2px 4px;}}
+        .tl-val {{font-size:11px;}}
+
+        /* Tabelas HTML custom (fora dos wrappers com overflow-x próprio) */
+        table {{font-size:.76rem;}}
+      }}
+
+      /* Phone pequeno (≤380px) — mais um aperto */
+      @media (max-width:380px) {{
+        html {{font-size:14.5px;}}
+        .result .arm {{font-size:1.02rem;}}
+        .topbar h1 {{font-size:.96rem;}}
+      }}
+
+      /* Qualquer dispositivo de toque (não só telas estreitas — inclui
+         tablets grandes) — feedback de toque + alvo mínimo garantido */
+      @media (hover:none) and (pointer:coarse) {{
+        .stButton > button {{min-height:44px;}}
+        a, .card, .side-svc {{-webkit-tap-highlight-color:rgba(26,111,255,.18);}}
+      }}
     </style>
     """,
     unsafe_allow_html=True,
@@ -2022,7 +2090,8 @@ if st.button("▶ Rodar DR-OPE (off-policy)", key="run_ope", **fill()):
     st.markdown(
         f'<div style="background:rgba(0,0,0,0.72);backdrop-filter:blur(12px);border-radius:12px;'
         f'padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.55),0 4px 14px rgba(0,0,0,.38)">'
-        f'<table style="width:100%;border-collapse:collapse">'
+        f'<div style="overflow-x:auto">'
+        f'<table style="width:100%;min-width:520px;border-collapse:collapse">'
         f'<thead><tr style="border-bottom:1px solid {GRID}">'
         f'<th style="padding:6px 10px;text-align:left;font-size:.72rem;color:{MUTED};letter-spacing:.05em">POLÍTICA</th>'
         f'<th style="padding:6px 8px;text-align:right;font-size:.72rem;color:{MUTED}">DR (R$)</th>'
@@ -2031,6 +2100,7 @@ if st.button("▶ Rodar DR-OPE (off-policy)", key="run_ope", **fill()):
         f'<th style="padding:6px 8px;text-align:right;font-size:.72rem;color:{MUTED}">DM</th>'
         f'<th style="padding:6px 8px;text-align:right;font-size:.72rem;color:{MUTED}">Δvar vs IPS</th>'
         f'</tr></thead><tbody>{_rows_html}</tbody></table>'
+        f'</div>'
         f'<div style="margin-top:12px;padding-top:11px;border-top:1px solid {GRID};'
         f'display:flex;align-items:center;gap:10px">'
         f'<span style="background:{hex_rgba(_gcol,.16)};color:{_gcol};border:1px solid {hex_rgba(_gcol,.4)};'
@@ -2795,7 +2865,8 @@ if st.button("🚀 Decidir oferta", type="primary", **fill()):
             f'<div style="color:{MUTED};font-size:.78rem;margin-bottom:12px">'
             f'P(conv) = conversão estimada pelo bandit contextual · '
             f'<span style="color:{GREEN};font-weight:700">verde = selecionada</span></div>'
-            f'<table style="width:100%;border-collapse:collapse">'
+            f'<div style="overflow-x:auto">'
+            f'<table style="width:100%;min-width:420px;border-collapse:collapse">'
             f'<thead><tr style="border-bottom:1px solid {GRID}">'
             f'<th style="padding:6px 10px 10px;font-size:.74rem;color:{MUTED};text-align:left;'
             f'font-weight:700;letter-spacing:.06em">OFERTA</th>'
@@ -2807,7 +2878,7 @@ if st.button("🚀 Decidir oferta", type="primary", **fill()):
             f'font-weight:700;letter-spacing:.06em">VALOR ESP.</th>'
             f'</tr></thead>'
             f'<tbody>{row_html}</tbody>'
-            f'</table></div>',
+            f'</table></div></div>',
             unsafe_allow_html=True,
         )
 

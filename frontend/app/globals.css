@@ -27,7 +27,10 @@
   body {
     min-height: 100%;
     /* Hero background image (/hero-bg.png), fixed on pure black. A translucent
-       overlay fades it so content stays readable over the glowing curve. */
+       overlay fades it so content stays readable over the glowing curve.
+       `fixed` is desktop-only: iOS Safari renders a fixed-attachment background
+       as if it were `scroll` anyway but with visible jank/flicker on touch-move,
+       so mobile gets a plain `scroll` attachment via the override below. */
     background:
       linear-gradient(rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)),
       url("/hero-bg.png") center / cover fixed no-repeat,
@@ -35,6 +38,19 @@
     color: var(--color-text);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  @media (max-width: 768px), (hover: none) and (pointer: coarse) {
+    html,
+    body {
+      background-attachment: scroll, scroll;
+    }
+  }
+
+  @media (max-width: 480px) {
+    html {
+      font-size: 15.5px;
+    }
   }
 }
 

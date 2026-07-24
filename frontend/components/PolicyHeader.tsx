@@ -23,15 +23,17 @@ export function PolicyHeader({ health, policy }: { health?: Health; policy?: Pol
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="card flex flex-col gap-3 px-6 py-5 sm:flex-row sm:items-center sm:justify-between"
+      className="card flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"
     >
       <div className="flex items-center gap-3">
-        <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/15 text-primary-soft">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary-soft sm:h-11 sm:w-11">
           <Satellite className="h-5 w-5" />
         </div>
-        <div>
-          <h1 className="text-xl font-extrabold tracking-tight">Adaptive Offers — Decision Console</h1>
-          <p className="text-sm text-muted">
+        <div className="min-w-0">
+          <h1 className="text-base font-extrabold leading-tight tracking-tight sm:text-xl">
+            Adaptive Offers — Decision Console
+          </h1>
+          <p className="text-xs text-muted sm:text-sm">
             Multi-armed bandit · política ativa{" "}
             <b className="text-text">
               {policy ? `${policy.name}@${policy.version}` : "—"}

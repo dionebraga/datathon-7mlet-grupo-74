@@ -18,7 +18,7 @@ export function Select({
     <div>
       <div className="mb-1.5 text-xs font-medium text-muted">{label}</div>
       <RSelect.Root value={value} onValueChange={onChange}>
-        <RSelect.Trigger className="flex w-full items-center justify-between rounded-lg border border-border bg-surface2 px-3 py-2 text-sm text-text outline-none transition hover:border-primary/40 focus:ring-2 focus:ring-primary/30">
+        <RSelect.Trigger className="flex min-h-11 w-full items-center justify-between rounded-lg border border-border bg-surface2 px-3 py-2.5 text-sm text-text outline-none transition hover:border-primary/40 focus:ring-2 focus:ring-primary/30">
           <RSelect.Value />
           <RSelect.Icon>
             <ChevronDown className="h-4 w-4 text-muted" />
@@ -31,7 +31,7 @@ export function Select({
                 <RSelect.Item
                   key={opt}
                   value={opt}
-                  className="flex cursor-pointer items-center justify-between rounded-md px-3 py-1.5 text-sm text-text outline-none data-[highlighted]:bg-primary/20"
+                  className="flex min-h-10 cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm text-text outline-none data-[highlighted]:bg-primary/20"
                 >
                   <RSelect.ItemText>{opt}</RSelect.ItemText>
                   <RSelect.ItemIndicator>

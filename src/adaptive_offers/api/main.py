@@ -198,6 +198,7 @@ def create_app() -> FastAPI:
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#000A18">
 <title>Adaptive Offers API v0.8.0</title>
 <link rel="icon" type="image/svg+xml" href="/logo.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -250,6 +251,22 @@ h1{font-size:2.2rem;font-weight:900;letter-spacing:-.03em;margin-bottom:8px}
 .bs{background:rgba(13,31,66,.9);border:1px solid #0D1F42;color:#EDEDED}
 .btn:hover{filter:brightness(1.15)}
 footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-top:1px solid #0D1F42}
+/* ── Responsivo / mobile ─────────────────────────────────────────── */
+@media (max-width:640px){
+  body{padding:28px 14px}
+  h1{font-size:1.55rem}
+  .sub{font-size:.82rem}
+  .stats-bar{gap:10px;margin:22px 0 28px}
+  .stat-pill{padding:10px 16px;min-width:100px}
+  .stat-num{font-size:1.3rem}
+  .grid{grid-template-columns:1fr;gap:10px}
+  .btns{gap:8px}
+  .btn{padding:10px 16px;font-size:12px;flex:1 1 auto;justify-content:center}
+  .stack-badges img{height:20px}
+}
+@media (hover:none) and (pointer:coarse){
+  .btn, .card{min-height:44px}
+}
 </style>
 </head>
 <body>
