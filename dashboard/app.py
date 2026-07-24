@@ -1556,13 +1556,17 @@ def p_heatmap_corr(df: pd.DataFrame, title: str) -> go.Figure:
         zmid=0, zmin=-1, zmax=1,
         text=[[f"{v:.2f}" for v in row] for row in corr.values],
         texttemplate="%{text}",
-        textfont=dict(size=12, family="Inter"),
+        textfont=dict(size=11, family="Inter"),
         hovertemplate="%{y} × %{x}<br>r = %{z:.2f}<extra></extra>",
+        xgap=3, ygap=3,
         colorbar=dict(thickness=12, len=0.85,
                       tickfont=dict(size=11, color=MUTED), tickformat=".1f",
                       bgcolor="rgba(0,0,0,0)", borderwidth=0),
     ))
-    fig.update_xaxes(tickangle=-35, automargin=True, tickfont=dict(size=11, color=MUTED))
+    # Vertical (not diagonal) labels: at -35deg the long names ("Contatos camp.",
+    # "Contatos ant.") visually lean into and collide with their neighbours in a
+    # narrow 1-of-4 column; -90 keeps each label within its own column width.
+    fig.update_xaxes(tickangle=-90, automargin=True, tickfont=dict(size=10, color=MUTED))
     fig.update_yaxes(automargin=True, tickfont=dict(size=11, color=MUTED))
     return style_panel(fig, title, height=GRID_H)
 
@@ -1774,7 +1778,10 @@ def p_policy_heatmap(title: str) -> go.Figure:
         for m in met:
             v = row[m]
             if m == "reward_per_1k":
-                row_txt.append(f"R${v:,.0f}")
+                # Abbreviated (12.3k, not 12,250) — the cell is ~1/4 of the
+                # dashboard width, and the full number crowds against its
+                # neighbours; the exact value is still in the hover tooltip.
+                row_txt.append(f"R${v/1000:.1f}k")
             elif m == "lift_vs_baseline_pct":
                 row_txt.append(f"{v:+.0f}%")
             else:
@@ -1804,12 +1811,15 @@ def p_policy_heatmap(title: str) -> go.Figure:
         colorscale=[[0.0, PANEL2], [0.45, VIOLET], [1.0, CYAN]],
         zmin=0, zmax=100, showscale=False,
         text=text_mat, texttemplate="%{text}",
-        textfont=dict(size=13, color="white", family="Inter"),
+        textfont=dict(size=11, color="white", family="Inter"),
         customdata=hover_mat,
         hovertemplate="%{customdata}<extra></extra>",
-        xgap=4, ygap=4,
+        xgap=5, ygap=5,
     ))
-    fig.update_xaxes(tickfont=dict(size=12, color=TEXT, family="Inter"), tickangle=-30,
+    # Vertical labels (not diagonal): in a narrow 1-of-4 column, a diagonal tilt
+    # visually leans into the neighbouring column's label and collides. Vertical
+    # text stays within its own column's width regardless of chart width.
+    fig.update_xaxes(tickfont=dict(size=11, color=TEXT, family="Inter"), tickangle=-90,
                      side="top", automargin=True)
     fig.update_yaxes(tickfont=dict(size=12, color=TEXT), automargin=True)
     fig.update_layout(
