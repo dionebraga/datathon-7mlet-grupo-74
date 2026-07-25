@@ -67,6 +67,8 @@ cliente e retorna a oferta ótima segundo a política ativa, com rastreabilidade
 
 > 🎓 **FIAP 7MLET — Grupo 74** · Dione Braga
 
+**Stack:** 🐍 `Python` · ⚡ `FastAPI` · 🧠 `scikit-learn` · 🐼 `pandas` · 🔢 `NumPy` · 🔬 `MLflow` · 🖥️ `Streamlit` · 📈 `Plotly` · ▲ `Next.js` · ⚛️ `React` · 🧊 `Three.js` · ✨ `GSAP` · 🧪 `pytest`
+
 ---
 
 ## 🎯 Formulação do Problema
