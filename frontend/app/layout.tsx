@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Hero3D from "@/components/Hero3D";
 
 export const metadata: Metadata = {
   title: "Adaptive Offers — Decision Console",
@@ -22,7 +23,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Hero3D />
+        {children}
+      </body>
     </html>
   );
 }

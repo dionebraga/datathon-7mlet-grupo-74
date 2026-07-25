@@ -32,7 +32,7 @@ export default function Page() {
   const m = (policy?.metrics ?? {}) as Record<string, number>;
 
   return (
-    <main className="mx-auto max-w-7xl space-y-5 px-4 py-6 lg:px-8">
+    <main className="relative z-10 mx-auto max-w-7xl space-y-5 px-4 py-6 lg:px-8">
       <PolicyHeader health={health} policy={policy} />
 
       {err && (
