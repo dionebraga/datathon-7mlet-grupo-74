@@ -61,7 +61,7 @@ def get_assistant():
 
 
 _DESCRIPTION = """
-Serviço de decisão contextual baseado em **Multi-Armed Bandits** para maximização
+🎰 Serviço de decisão contextual baseado em **Multi-Armed Bandits** para maximização
 de receita em campanhas de ofertas financeiras. Cada request recebe o contexto do
 cliente e retorna a oferta ótima segundo a política ativa, com rastreabilidade completa.
 
@@ -69,7 +69,7 @@ cliente e retorna a oferta ótima segundo a política ativa, com rastreabilidade
 
 ---
 
-## Formulação do Problema
+## 🎯 Formulação do Problema
 
 A cada impressão *t*, dado o vetor de contexto **x**ₜ ∈ ℝᵈ e o conjunto de braços
 elegíveis 𝒜ₜ ⊆ 𝒜, o agente seleciona:
@@ -86,27 +86,27 @@ O **regret acumulado** mede a sub-optimalidade da política em relação ao orá
 
 ---
 
-## Políticas Implementadas
+## 🤖 Políticas Implementadas
 
 | Política | Estratégia | Referência |
 |----------|-----------|------------|
-| **Thompson Sampling** | Amostragem do posterior Beta-Bernoulli: θₐ ~ Beta(αₐ + Sₐ, βₐ + Fₐ) | Thompson (1933) |
-| **Nilos-UCB (UCB-V)** | UCB consciente de variância: μ̂ₐ + √(2Vₐ ln t/nₐ) + b ln t/nₐ | Audibert et al. (2009) |
-| **LinUCB** | Bandit linear com Ridge: θ̂ = (AᵀA + λI)⁻¹Aᵀb; UCB = θ̂ᵀ**x** + α√(**x**ᵀA⁻¹**x**) | Li et al. (2010) |
-| **Baseline** | Greedy puro: argmax μ̂ₐ (sem exploração) | Controle experimental |
+| 🎲 **Thompson Sampling** | Amostragem do posterior Beta-Bernoulli: θₐ ~ Beta(αₐ + Sₐ, βₐ + Fₐ) | Thompson (1933) |
+| 📈 **Nilos-UCB (UCB-V)** | UCB consciente de variância: μ̂ₐ + √(2Vₐ ln t/nₐ) + b ln t/nₐ | Audibert et al. (2009) |
+| 📐 **LinUCB** | Bandit linear com Ridge: θ̂ = (AᵀA + λI)⁻¹Aᵀb; UCB = θ̂ᵀ**x** + α√(**x**ᵀA⁻¹**x**) | Li et al. (2010) |
+| ⚙️ **Baseline** | Greedy puro: argmax μ̂ₐ (sem exploração) | Controle experimental |
 
 ---
 
-## Guardrails de Elegibilidade
+## 🛡️ Guardrails de Elegibilidade
 
 Antes de selecionar o braço, o serviço aplica filtros de elegibilidade:
-- **Suitability tier** — clientes em `default=yes` não são elegíveis para ofertas `restricted`
-- **Loan filter** — clientes com empréstimo ativo têm restrições de cross-sell
-- **Minimum arms** — garante ≥ 1 braço elegível por decisão
+- 🚫 **Suitability tier** — clientes em `default=yes` não são elegíveis para ofertas `restricted`
+- 💳 **Loan filter** — clientes com empréstimo ativo têm restrições de cross-sell
+- ✅ **Minimum arms** — garante ≥ 1 braço elegível por decisão
 
 ---
 
-## Auditoria
+## 📋 Auditoria
 
 Toda decisão é registrada em `artifacts/decisions/audit.jsonl` com:
 `decision_id`, `ts`, `arm_id`, `score`, `explored`, `reason_codes`, `estimates`
@@ -143,6 +143,22 @@ _SWAGGER_DARK_CSS = """
   .swagger-ui .info hgroup.main{margin:0 0 12px !important;}
   .swagger-ui .info .title{
     color:var(--ao-text) !important; font-weight:800 !important; letter-spacing:-.02em !important;
+    display:flex !important; align-items:center !important; gap:12px !important; flex-wrap:wrap !important;
+  }
+  /* Ícone de marca (barras do bandit + braço vencedor em dourado) antes do
+     título — mesma linguagem visual do favicon/_LOGO_SVG, em versão simples
+     o bastante pra caber com segurança num data-URI de CSS sem gradientes. */
+  .swagger-ui .info .title::before{
+    content:"";
+    order:-1;
+    width:38px; height:38px; flex:0 0 38px;
+    border-radius:11px;
+    background-color:rgba(26,111,255,.14);
+    border:1px solid rgba(26,111,255,.32);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Crect x='3' y='13' width='3.6' height='8' rx='1' fill='%231A6FFF' fill-opacity='.5'/%3E%3Crect x='10.2' y='8' width='3.6' height='13' rx='1' fill='%231A6FFF' fill-opacity='.78'/%3E%3Crect x='17.4' y='3' width='3.6' height='18' rx='1' fill='%231A6FFF'/%3E%3Ccircle cx='19.2' cy='3' r='2.3' fill='%23FFC200'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:20px 20px;
   }
   .swagger-ui .info .title small{
     background:var(--ao-blue-dk) !important; box-shadow:none !important;
