@@ -114,6 +114,196 @@ Toda decisão é registrada em `artifacts/decisions/audit.jsonl` com:
 **FIAP 7MLET — Grupo 74** · Dione Braga · Licença MIT
 """
 
+# Tema escuro do Swagger UI — mesma paleta da landing page (/), para a doc
+# interativa não "quebrar" a identidade visual do site com o branco padrão de
+# fábrica. Cores por método HTTP reaproveitam exatamente as classes .get/.post/
+# .put/.del/.patch já definidas na landing (root()), e as cores por tag (ops/
+# decision/catalog/metrics/admin/assistant) reaproveitam .t-ops/.t-dec/etc.
+_SWAGGER_DARK_CSS = """
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :root{
+    --ao-bg:#000A18; --ao-panel:#030D24; --ao-panel2:#050E24; --ao-border:#0D1F42;
+    --ao-text:#EDEDED; --ao-muted:#8899BB;
+    --ao-blue:#1A6FFF; --ao-blue-dk:#0033CC;
+    --ao-green:#1A9E1A; --ao-gold:#FFC200; --ao-red:#E84000; --ao-amber:#FF9A00;
+    --ao-olive:#A0C830;
+  }
+  html, body{background:var(--ao-bg) !important;}
+  body, .swagger-ui{
+    font-family:'Inter',-apple-system,sans-serif !important;
+    color:var(--ao-text) !important;
+  }
+  .swagger-ui{background:var(--ao-bg) !important;}
+  /* topbar padrão (verde, barra de URL) — não se aplica (spec única, fixa) */
+  .swagger-ui .topbar{display:none !important;}
+
+  /* ── Cabeçalho (.info): título, versão, descrição markdown ─────────── */
+  .swagger-ui .info{margin:28px 0 !important;}
+  .swagger-ui .info hgroup.main{margin:0 0 12px !important;}
+  .swagger-ui .info .title{
+    color:var(--ao-text) !important; font-weight:800 !important; letter-spacing:-.02em !important;
+  }
+  .swagger-ui .info .title small{
+    background:var(--ao-blue-dk) !important; box-shadow:none !important;
+    border-radius:999px !important; vertical-align:middle !important;
+  }
+  .swagger-ui .info .title small.version-stamp{background:var(--ao-blue-dk) !important;}
+  .swagger-ui .info .title small pre{color:#fff !important; background:transparent !important;}
+  .swagger-ui .info a.url,
+  .swagger-ui .info .base-url{color:var(--ao-muted) !important;}
+  .swagger-ui .info li, .swagger-ui .info p, .swagger-ui .info table{color:var(--ao-muted) !important;}
+  .swagger-ui .info a{color:var(--ao-blue) !important;}
+
+  /* ── Markdown renderizado (descrição, fórmulas, tabelas) ────────────── */
+  .swagger-ui .renderedMarkdown p,
+  .swagger-ui .renderedMarkdown li{color:var(--ao-muted) !important; line-height:1.65 !important;}
+  .swagger-ui .renderedMarkdown h1,
+  .swagger-ui .renderedMarkdown h2,
+  .swagger-ui .renderedMarkdown h3{
+    color:var(--ao-text) !important; border-bottom:1px solid var(--ao-border) !important;
+    padding-bottom:8px !important; margin-top:28px !important;
+  }
+  .swagger-ui .renderedMarkdown strong{color:var(--ao-text) !important;}
+  .swagger-ui .renderedMarkdown blockquote{
+    background:var(--ao-panel) !important; border-left:3px solid var(--ao-blue) !important;
+    border-radius:0 8px 8px 0 !important; padding:10px 16px !important; margin:12px 0 !important;
+  }
+  .swagger-ui .renderedMarkdown blockquote p{color:var(--ao-text) !important;}
+  .swagger-ui .renderedMarkdown code{
+    background:var(--ao-panel) !important; color:#7CC4FF !important;
+    border:1px solid var(--ao-border) !important; border-radius:4px !important;
+  }
+  .swagger-ui .renderedMarkdown hr{border-color:var(--ao-border) !important;}
+  .swagger-ui .renderedMarkdown table{border:1px solid var(--ao-border) !important;}
+  .swagger-ui .renderedMarkdown table thead tr{background:var(--ao-panel2) !important;}
+  .swagger-ui .renderedMarkdown table th{color:var(--ao-text) !important; border-color:var(--ao-border) !important;}
+  .swagger-ui .renderedMarkdown table td{
+    color:var(--ao-muted) !important; background:var(--ao-panel) !important;
+    border-color:var(--ao-border) !important;
+  }
+
+  /* ── Cabeçalhos de seção (tags: ops/decision/catalog/metrics/admin/assistant) ── */
+  .swagger-ui .opblock-tag{
+    color:var(--ao-text) !important; border-bottom:1px solid var(--ao-border) !important;
+  }
+  .swagger-ui .opblock-tag:hover{background:var(--ao-panel) !important;}
+  .swagger-ui .opblock-tag small{color:var(--ao-muted) !important;}
+  .swagger-ui .opblock-tag svg{fill:var(--ao-muted) !important;}
+
+  /* ── Blocos de endpoint — cor por método, tema escuro ───────────────── */
+  .swagger-ui .opblock{
+    background:var(--ao-panel) !important; border-radius:10px !important;
+    box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
+  }
+  .swagger-ui .opblock .opblock-summary-description{color:var(--ao-muted) !important;}
+  .swagger-ui .opblock .opblock-summary-path,
+  .swagger-ui .opblock .opblock-summary-path__deprecated{color:var(--ao-text) !important;}
+  .swagger-ui .opblock .opblock-section-header{
+    background:var(--ao-panel2) !important; box-shadow:none !important;
+    border-bottom:1px solid var(--ao-border) !important;
+  }
+  .swagger-ui .opblock .opblock-section-header h4,
+  .swagger-ui .opblock .opblock-section-header label{color:var(--ao-text) !important;}
+  .swagger-ui .opblock .parameters-col_description p,
+  .swagger-ui .opblock .parameter__name,
+  .swagger-ui .opblock .parameter__type,
+  .swagger-ui .opblock .parameter__deprecated,
+  .swagger-ui .opblock .parameter__in{color:var(--ao-muted) !important;}
+  .swagger-ui .opblock .parameter__name{color:var(--ao-text) !important; font-weight:700 !important;}
+  .swagger-ui table.parameters, .swagger-ui table.responses-table{border-color:var(--ao-border) !important;}
+  .swagger-ui .opblock .tab-header .tab-item.active h4 span{
+    color:var(--ao-text) !important; border-bottom-color:var(--ao-blue) !important;
+  }
+  .swagger-ui .opblock .tab-header .tab-item h4 span{color:var(--ao-muted) !important;}
+  .swagger-ui .response-col_status{color:var(--ao-text) !important;}
+  .swagger-ui .response-col_description{color:var(--ao-muted) !important;}
+  .swagger-ui .responses-inner h4, .swagger-ui .responses-inner h5{color:var(--ao-text) !important;}
+  .swagger-ui .opblock .opblock-title_normal p{color:var(--ao-muted) !important;}
+
+  /* GET (ops/catalog/metrics reads) → azul, alinhado a .get da landing */
+  .swagger-ui .opblock.opblock-get{border-color:rgba(26,111,255,.35) !important;
+    background:rgba(26,111,255,.05) !important;}
+  .swagger-ui .opblock.opblock-get .opblock-summary{border-color:rgba(26,111,255,.35) !important;}
+  .swagger-ui .opblock.opblock-get .opblock-summary-method{background:var(--ao-blue) !important;}
+  /* POST (decide/explain/simulate) → verde, alinhado a .post da landing */
+  .swagger-ui .opblock.opblock-post{border-color:rgba(26,158,26,.35) !important;
+    background:rgba(26,158,26,.05) !important;}
+  .swagger-ui .opblock.opblock-post .opblock-summary{border-color:rgba(26,158,26,.35) !important;}
+  .swagger-ui .opblock.opblock-post .opblock-summary-method{background:var(--ao-green) !important;}
+  /* PUT (policy/active) → dourado */
+  .swagger-ui .opblock.opblock-put{border-color:rgba(255,194,0,.35) !important;
+    background:rgba(255,194,0,.05) !important;}
+  .swagger-ui .opblock.opblock-put .opblock-summary{border-color:rgba(255,194,0,.35) !important;}
+  .swagger-ui .opblock.opblock-put .opblock-summary-method{background:var(--ao-gold) !important; color:#000 !important;}
+  /* PATCH → laranja */
+  .swagger-ui .opblock.opblock-patch{border-color:rgba(255,154,0,.35) !important;
+    background:rgba(255,154,0,.05) !important;}
+  .swagger-ui .opblock.opblock-patch .opblock-summary{border-color:rgba(255,154,0,.35) !important;}
+  .swagger-ui .opblock.opblock-patch .opblock-summary-method{background:var(--ao-amber) !important;}
+  /* DELETE (audit cleanup) → vermelho-laranja */
+  .swagger-ui .opblock.opblock-delete{border-color:rgba(232,64,0,.35) !important;
+    background:rgba(232,64,0,.05) !important;}
+  .swagger-ui .opblock.opblock-delete .opblock-summary{border-color:rgba(232,64,0,.35) !important;}
+  .swagger-ui .opblock.opblock-delete .opblock-summary-method{background:var(--ao-red) !important;}
+
+  /* ── Formulários (Try it out) ────────────────────────────────────────── */
+  .swagger-ui select, .swagger-ui input[type=text], .swagger-ui input[type=email],
+  .swagger-ui input[type=password], .swagger-ui input[type=search], .swagger-ui textarea{
+    background:var(--ao-panel2) !important; color:var(--ao-text) !important;
+    border:1px solid var(--ao-border) !important; border-radius:6px !important;
+  }
+  .swagger-ui select:focus, .swagger-ui input:focus, .swagger-ui textarea:focus{
+    border-color:var(--ao-blue) !important; outline:none !important;
+  }
+  .swagger-ui .btn{
+    background:var(--ao-panel2) !important; color:var(--ao-text) !important;
+    border:1px solid var(--ao-border) !important; border-radius:8px !important; box-shadow:none !important;
+  }
+  .swagger-ui .btn:hover{border-color:var(--ao-blue) !important;}
+  .swagger-ui .btn.execute{
+    background:linear-gradient(135deg,var(--ao-blue-dk),var(--ao-blue)) !important;
+    color:#fff !important; border:none !important; font-weight:700 !important;
+  }
+  .swagger-ui .btn.try-out__btn{border-color:var(--ao-blue) !important; color:var(--ao-blue) !important;}
+  .swagger-ui .btn.cancel{border-color:var(--ao-red) !important; color:var(--ao-red) !important;}
+  .swagger-ui .authorization__btn svg{fill:var(--ao-muted) !important;}
+
+  /* ── Blocos de código / JSON (request/response) ─────────────────────── */
+  .swagger-ui .highlight-code, .swagger-ui .microlight,
+  .swagger-ui .body-param__example, .swagger-ui pre{
+    background:#000000 !important; color:#B9D6FF !important;
+    border:1px solid var(--ao-border) !important; border-radius:8px !important;
+  }
+  .swagger-ui .highlight-code .hljs, .swagger-ui pre.microlight code{background:transparent !important;}
+
+  /* ── Modelos / Schemas ────────────────────────────────────────────────── */
+  .swagger-ui .model-box{background:var(--ao-panel) !important; border-radius:8px !important;}
+  .swagger-ui .model, .swagger-ui .model-title{color:var(--ao-text) !important;}
+  .swagger-ui .model .property.primitive{color:#7CC4FF !important;}
+  .swagger-ui .model-toggle:after{filter:invert(1) !important;}
+  .swagger-ui section.models{
+    background:var(--ao-panel) !important; border:1px solid var(--ao-border) !important;
+  }
+  .swagger-ui section.models h4{color:var(--ao-text) !important;}
+  .swagger-ui section.models .model-container{
+    background:var(--ao-panel2) !important; border-radius:8px !important;
+  }
+
+  /* ── Scrollbar consistente com o resto do site ───────────────────────── */
+  .swagger-ui ::-webkit-scrollbar{width:10px; height:10px;}
+  .swagger-ui ::-webkit-scrollbar-thumb{background:var(--ao-border); border-radius:999px;}
+
+  /* ── Loading spinner / diversos ───────────────────────────────────────── */
+  .swagger-ui .loading-container .loading:after{border-color:var(--ao-blue) transparent transparent transparent !important;}
+  .swagger-ui .servers > label{color:var(--ao-muted) !important;}
+  .swagger-ui .servers select{background:var(--ao-panel2) !important; color:var(--ao-text) !important;}
+  .swagger-ui .filter .operation-filter-input{
+    background:var(--ao-panel2) !important; color:var(--ao-text) !important; border-color:var(--ao-border) !important;
+  }
+</style>
+"""
+
 # Logo vetorial da marca (mesma arte do dashboard): 3 barras = braços do bandit,
 # linha = aprendizado, ponto dourado = braço escolhido. Sem width/height fixos →
 # escala via viewBox (serve como favicon e embute na landing).
@@ -387,12 +577,17 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
 
     @app.get("/docs", include_in_schema=False)
     def custom_swagger() -> HTMLResponse:
-        """Swagger UI com o logo do projeto como favicon."""
-        return get_swagger_ui_html(
+        """Swagger UI com o logo do projeto e tema escuro (mesma identidade da landing)."""
+        base = get_swagger_ui_html(
             openapi_url=app.openapi_url or "/openapi.json",
             title="Adaptive Offers API — Swagger UI",
             swagger_favicon_url="/logo.svg",
         )
+        # Injeta o CSS do tema escuro antes de </head> — carrega DEPOIS do CSS
+        # padrão do Swagger (CDN), então os overrides ganham na cascata.
+        html = base.body.decode("utf-8")
+        html = html.replace("</head>", _SWAGGER_DARK_CSS + "</head>")
+        return HTMLResponse(content=html)
 
     @app.get(
         "/health",
