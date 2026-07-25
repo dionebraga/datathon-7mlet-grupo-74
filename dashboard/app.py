@@ -513,30 +513,35 @@ st.markdown(
             #000 42%, rgba(0,0,0,.5) 66%, transparent 84%) 50% 47% / 0% 0% no-repeat;
         mask:radial-gradient(circle at 50% 47%,
             #000 42%, rgba(0,0,0,.5) 66%, transparent 84%) 50% 47% / 0% 0% no-repeat;
-        animation:heroGrow 4.2s cubic-bezier(.16,.8,.24,1) both,
-                  heroDrift 46s ease-in-out 4.2s infinite alternate;}}
+        animation:heroGrow 6.5s .4s cubic-bezier(.16,.8,.24,1) both,
+                  heroDrift 46s ease-in-out 6.9s infinite alternate;}}
       /* conteúdo sempre ACIMA do fundo (fórmulas já estão assadas na foto, então
          elas se movem JUNTO com a imagem) */
       [data-testid="stMain"], [data-testid="stSidebar"],
       [data-testid="stHeader"] {{position:relative; z-index:1;}}
-      /* Surge ao carregar a página (F5 / primeira abertura) — mais longa e com
-         um leve "respiro" de brilho no meio antes de assentar na deriva contínua.
-         Só dispara em reload de verdade: cliques/reruns do Streamlit não recriam
-         este elemento, então não repetem a animação (comportamento normal de SPA). */
+      /* Surge ao carregar a página (F5 / primeira abertura): 0.4s de espera +
+         6.5s de crescimento — deliberadamente longa, para que a janela em que
+         ela está "no meio do gesto" se sobreponha à janela em que o spinner de
+         carregamento ainda está na tela (a simulação pode levar dezenas de
+         segundos), garantindo que o usuário PEGUE o movimento e não só o
+         estado final. Só dispara em reload de verdade: cliques/reruns do
+         Streamlit não recriam este elemento, então não repetem a animação
+         (comportamento normal de SPA), exceto o botão "Decidir oferta"
+         (instrumentado à parte com seu próprio keyframe). */
       @keyframes heroGrow {{
         0%   {{opacity:0;   transform:scale(1.02);
                -webkit-mask-size:0% 0%; mask-size:0% 0%;}}
-        45%  {{opacity:.56; transform:scale(1.05);
+        50%  {{opacity:.42; transform:scale(1.05);
                -webkit-mask-size:220% 220%; mask-size:220% 220%;}}
-        72%  {{opacity:.40;}}
-        100% {{opacity:.46; transform:scale(1.06);
+        75%  {{opacity:.28;}}
+        100% {{opacity:.32; transform:scale(1.06);
                -webkit-mask-size:340% 340%; mask-size:340% 340%;}}}}
       @keyframes heroDrift {{
         0%   {{transform:scale(1.06) translate3d(0,0,0);}}
         50%  {{transform:scale(1.12) translate3d(-1.6%,1.1%,0);}}
         100% {{transform:scale(1.09) translate3d(1.6%,-1.1%,0);}}}}
       @media (prefers-reduced-motion: reduce) {{
-        .stApp::before {{animation:none; opacity:.46;
+        .stApp::before {{animation:none; opacity:.32;
           filter:none; -webkit-mask:none; mask:none;}}}}
       /* ── Layout base ─────────────────────────────────────────── */
       .block-container {{padding-top:1.2rem;padding-bottom:0.8rem;max-width:1600px;}}
@@ -680,18 +685,21 @@ st.markdown(
       .topbar .eyebrow::before {{content:"";width:18px;height:2px;border-radius:2px;
         background:{CYAN};display:inline-block;}}
       .topbar h1 {{margin:0;font-size:2.40rem;font-weight:800;letter-spacing:-.035em;
-        line-height:1.0;color:{TEXT};display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}}
+        line-height:1.0;color:{TEXT};}}
       .topbar .hero-grad {{
         background:linear-gradient(92deg,#FFFFFF 0%,#A9C7FF 55%,{CYAN} 100%);
         -webkit-background-clip:text;background-clip:text;
         -webkit-text-fill-color:transparent;color:transparent;}}
-      .topbar .hero-board {{font-weight:600;color:{MUTED};font-size:1.15rem;
-        letter-spacing:.01em;text-transform:none;
-        border-left:1px solid rgba(255,255,255,.15);padding-left:14px;}}
+      .topbar .hero-board {{display:block;font-weight:600;color:{MUTED};font-size:.82rem;
+        letter-spacing:.10em;text-transform:uppercase;margin-top:5px;}}
       .topbar .sub {{color:#A7B6D6;font-size:1.0rem;margin-top:14px;font-weight:500;
         line-height:1.5;}}
-      .topbar .hero-badges {{display:flex;flex-direction:column;gap:7px;align-items:flex-end;
-        flex-shrink:0;}}
+      /* Badges de status: cluster horizontal num "cartão" próprio, em vez de
+         3 pílulas soltas empilhadas — leem como um grupo, não fragmentos. */
+      .topbar .hero-badges {{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;
+        align-items:center;justify-content:flex-end;flex-shrink:0;
+        background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06);
+        border-radius:12px;padding:9px 11px;}}
       /* ── Badges de status ─────────────────────────────────────── */
       .stat {{display:inline-block;padding:5px 12px;border-radius:999px;font-size:.78rem;
         font-weight:700;margin-left:5px;background:rgba(255,255,255,.06);
@@ -1606,9 +1614,11 @@ def p_heatmap_corr(df: pd.DataFrame, title: str) -> go.Figure:
         textfont=dict(size=11, family="Inter"),
         hovertemplate="%{y} × %{x}<br>r = %{z:.2f}<extra></extra>",
         xgap=3, ygap=3,
-        colorbar=dict(thickness=12, len=0.85,
-                      tickfont=dict(size=11, color=MUTED), tickformat=".1f",
-                      bgcolor="rgba(0,0,0,0)", borderwidth=0),
+        # No colorbar: with 5 metric columns already competing for a narrow
+        # panel, its ~90px (bar + tick labels) is better spent on the grid
+        # itself. Red/blue + the exact in-cell value already convey sign and
+        # magnitude; the caption above explains the Pearson-r scale.
+        showscale=False,
     ))
     # Vertical (not diagonal) labels: at -35deg the long names ("Contatos camp.",
     # "Contatos ant.") visually lean into and collide with their neighbours in a
@@ -2433,10 +2443,12 @@ st.markdown(
     '<b>Correlação</b>: heatmap Pearson entre features numéricas e variável alvo.</div>',
     unsafe_allow_html=True,
 )
-d1, d2, d3, d4 = st.columns(4)
+d1, d2, d3, d4 = st.columns([1, 1, 1, 2.3])
 d1.plotly_chart(p_lollipop_v(by_pout.index, by_pout.values, "Conversão · poutcome", CYAN), config=NO_BAR, **fill())
 d2.plotly_chart(p_bar_cat(by_contact.index, by_contact.values, "Conversão · canal de contato", GREEN), config=NO_BAR, **fill())
 d3.plotly_chart(p_lollipop_v(by_age.index.astype(str), by_age.values, "Conversão · faixa etária", AMBER), config=NO_BAR, **fill())
+# 5 metric columns (one more than the multi-metric heatmap) -> needs the most
+# room of the row; same reasoning as the "Comparação multi-métrica" fix.
 d4.plotly_chart(p_heatmap_corr(processed, "🔬 Correlação de features"), config=NO_BAR, **fill())
 
 # --- Grid row E: comparison + ops ------------------------------------------ #
@@ -2657,8 +2669,8 @@ if st.button("🚀 Decidir oferta", type="primary", **fill()):
         "<style>"
         f"@keyframes heroRegrow{_dn}{{"
         "0%{opacity:0;-webkit-mask-size:0% 0%;mask-size:0% 0%;transform:scale(1.04);}"
-        "60%{opacity:.46;}"
-        "100%{opacity:.46;-webkit-mask-size:340% 340%;mask-size:340% 340%;transform:scale(1.06);}}"
+        "60%{opacity:.32;}"
+        "100%{opacity:.32;-webkit-mask-size:340% 340%;mask-size:340% 340%;transform:scale(1.06);}}"
         ".stApp::before{"
         f"animation:heroRegrow{_dn} 2.4s cubic-bezier(.2,.7,.2,1) both,"
         "heroDrift 46s ease-in-out 2.4s infinite alternate !important;}"
