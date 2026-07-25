@@ -405,34 +405,34 @@ def create_app() -> FastAPI:
         openapi_tags=[
             {
                 "name": "admin",
-                "description": "Endpoints administrativos: auditoria, simulação on-demand, "
+                "description": "🔐 Endpoints administrativos: auditoria, simulação on-demand, "
                                "troca de política ativa e gestão de versões. Acesso restrito.",
             },
             {
                 "name": "ops",
-                "description": "Liveness, readiness e metadados da política ativa. "
+                "description": "🛰️ Liveness, readiness e metadados da política ativa. "
                                "Use `/health` como probe de Kubernetes e `/policy` para "
                                "inspeção da versão em produção.",
             },
             {
                 "name": "catalog",
-                "description": "Catálogo dos braços disponíveis (6 ofertas financeiras). "
+                "description": "🗂️ Catálogo dos braços disponíveis (6 ofertas financeiras). "
                                "Cada braço possui `margin` (R$), `category` e `suitability_tier`.",
             },
             {
                 "name": "decision",
-                "description": "**Endpoint central.** Recebe o contexto do cliente → "
+                "description": "🎯 **Endpoint central.** Recebe o contexto do cliente → "
                                "aplica guardrails de elegibilidade → executa a política bandit → "
                                "retorna decisão auditável com `reason_codes` e estimativas por braço.",
             },
             {
                 "name": "metrics",
-                "description": "Avaliação offline das políticas: matriz de comparação "
+                "description": "📊 Avaliação offline das políticas: matriz de comparação "
                                "(reward, regret, lift) e curvas de regret acumulado para visualização.",
             },
             {
                 "name": "assistant",
-                "description": "Explicação em linguagem natural da decisão via LLM + RAG. "
+                "description": "💬 Explicação em linguagem natural da decisão via LLM + RAG. "
                                "Recupera chunks da política comercial e gera resposta contextualizada.",
             },
         ],
@@ -661,7 +661,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/health",
         response_model=HealthOut,
         tags=["ops"],
-        summary="Liveness & readiness probe",
+        summary="💓 Liveness & readiness probe",
         response_description="Status do serviço, política carregada e feature store materializado.",
         responses={503: {"model": ErrorOut, "description": "Serviço indisponível — bootstrap em progresso."}},
     )
@@ -697,7 +697,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/policy",
         response_model=PolicyOut,
         tags=["ops"],
-        summary="Metadados da política ativa",
+        summary="📄 Metadados da política ativa",
         response_description="Nome, versão, data de treino e métricas offline da política em produção.",
         responses={503: {"model": ErrorOut, "description": "Nenhuma política treinada encontrada."}},
     )
@@ -726,7 +726,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/offers",
         response_model=list[OfferOut],
         tags=["catalog"],
-        summary="Catálogo de ofertas (braços do bandit)",
+        summary="🎁 Catálogo de ofertas (braços do bandit)",
         response_description="Lista das 6 ofertas financeiras disponíveis com margens e suitability.",
     )
     def offers() -> list[OfferOut]:
@@ -755,7 +755,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/decide",
         response_model=DecisionOut,
         tags=["decision"],
-        summary="Decisão contextual de oferta (endpoint principal)",
+        summary="🎯 Decisão contextual de oferta (endpoint principal)",
         response_description="Registro auditável: braço escolhido, score, estimates por oferta, reason codes.",
         responses={
             400: {"model": ErrorOut, "description": "Contexto inválido — nenhum braço elegível ou feature fora do domínio."},
@@ -821,7 +821,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/metrics",
         response_model=list[MetricsOut],
         tags=["metrics"],
-        summary="Matriz de comparação de políticas (avaliação offline)",
+        summary="📊 Matriz de comparação de políticas (avaliação offline)",
         response_description="Lista ordenada por reward decrescente com todas as métricas por política.",
         responses={503: {"model": ErrorOut, "description": "Bootstrap incompleto — dados ou bundle ausentes."}},
     )
@@ -860,7 +860,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/metrics/regret-curve",
         response_model=list[RegretCurveOut],
         tags=["metrics"],
-        summary="Curvas de regret acumulado por política",
+        summary="📉 Curvas de regret acumulado por política",
         response_description="Arrays (steps, regret) downsampled para cada política — prontos para plotagem.",
         responses={503: {"model": ErrorOut, "description": "Simulação falhou — verifique os dados de entrada."}},
     )
@@ -924,7 +924,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/assistant/explain",
         response_model=AssistantOut,
         tags=["assistant"],
-        summary="Explicação LLM+RAG de uma decisão contextual",
+        summary="💬 Explicação LLM+RAG de uma decisão contextual",
         response_description="Resposta em linguagem natural com citações das políticas comerciais (RAG).",
         responses={
             400: {"model": ErrorOut, "description": "Contexto inválido — não foi possível gerar decisão."},
@@ -988,7 +988,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/audit",
         response_model=AuditSummaryOut,
         tags=["admin"],
-        summary="Query do log auditável de decisões",
+        summary="🔎 Query do log auditável de decisões",
         response_description="Últimas N decisões com metadados completos.",
         responses={503: {"model": ErrorOut}},
     )
@@ -1043,7 +1043,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/audit",
         response_model=DeleteOut,
         tags=["admin"],
-        summary="Limpar log de auditoria",
+        summary="🧹 Limpar log de auditoria",
         response_description="Número de decisões removidas.",
         responses={503: {"model": ErrorOut}},
     )
@@ -1072,7 +1072,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/policy/versions",
         response_model=list[PolicyVersionOut],
         tags=["admin"],
-        summary="Listar versões de política disponíveis",
+        summary="📚 Listar versões de política disponíveis",
         response_description="Versões treinadas em artifacts/ com status de ativação.",
     )
     def list_policy_versions() -> list[PolicyVersionOut]:
@@ -1104,7 +1104,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/policy/active",
         response_model=PolicyOut,
         tags=["admin"],
-        summary="Trocar política ativa (rollback / promoção)",
+        summary="🔄 Trocar política ativa (rollback / promoção)",
         response_description="Metadados da nova política ativa após a troca.",
         responses={
             400: {"model": ErrorOut, "description": "Versão inválida ou política não encontrada."},
@@ -1137,7 +1137,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/policy/active",
         response_model=PolicyOut,
         tags=["admin"],
-        summary="Atualizar parâmetros da política ativa (alias de PUT)",
+        summary="✏️ Atualizar parâmetros da política ativa (alias de PUT)",
         response_description="Mesma semântica que PUT /policy/active.",
         responses={
             400: {"model": ErrorOut},
@@ -1153,7 +1153,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/simulate",
         response_model=SimulateOut,
         tags=["admin"],
-        summary="Rodar simulação on-demand e retornar métricas",
+        summary="▶️ Rodar simulação on-demand e retornar métricas",
         response_description="Métricas de todas as políticas solicitadas para o horizonte dado.",
         responses={400: {"model": ErrorOut}, 503: {"model": ErrorOut}},
     )
@@ -1192,7 +1192,7 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         "/offers/{offer_id}",
         response_model=OfferOut,
         tags=["catalog"],
-        summary="Detalhe de uma oferta específica",
+        summary="🏷️ Detalhe de uma oferta específica",
         response_description="Dados completos da oferta pelo ID.",
         responses={404: {"model": ErrorOut, "description": "Oferta não encontrada."}},
     )
