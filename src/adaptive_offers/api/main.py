@@ -301,6 +301,56 @@ _SWAGGER_DARK_CSS = """
   .swagger-ui .filter .operation-filter-input{
     background:var(--ao-panel2) !important; color:var(--ao-text) !important; border-color:var(--ao-border) !important;
   }
+
+  /* ── Faixa "Servers" (scheme-container) — era o branco padrão de fábrica ── */
+  .swagger-ui .scheme-container{
+    background:var(--ao-panel) !important; box-shadow:none !important;
+    border-top:1px solid var(--ao-border) !important;
+    border-bottom:1px solid var(--ao-border) !important;
+  }
+  .swagger-ui .servers-title{color:var(--ao-text) !important;}
+
+  /* ── Schemas (renderizador JSON Schema 2020-12 do Swagger 5) ─────────────
+     Os "chips" brancos atrás dos nomes (AssistantOut…) e do "Expand all" são
+     os botões accordion/expand-all do renderizador novo — classes diferentes
+     do .model-box antigo, por isso escaparam do primeiro passe do tema. */
+  .swagger-ui .json-schema-2020-12,
+  .swagger-ui .json-schema-2020-12-accordion,
+  .swagger-ui .json-schema-2020-12-expand-deep-button,
+  .swagger-ui .json-schema-2020-12-expand-all{
+    background:transparent !important; color:var(--ao-text) !important;
+    border:none !important; box-shadow:none !important;
+  }
+  .swagger-ui .json-schema-2020-12-expand-deep-button,
+  .swagger-ui .json-schema-2020-12-expand-all{
+    color:var(--ao-muted) !important; font-size:.72rem !important;
+  }
+  .swagger-ui .json-schema-2020-12__title{color:var(--ao-text) !important;}
+  .swagger-ui .json-schema-2020-12__attribute,
+  .swagger-ui .json-schema-2020-12__attribute--primary{color:#7CC4FF !important;}
+  .swagger-ui .json-schema-2020-12-keyword__name{color:var(--ao-muted) !important;}
+  .swagger-ui .json-schema-2020-12-keyword__value{color:#7CC4FF !important;}
+  .swagger-ui .json-schema-2020-12-accordion__icon svg,
+  .swagger-ui .json-schema-2020-12-expand-all svg{fill:var(--ao-muted) !important;}
+  .swagger-ui .json-schema-2020-12-property{color:var(--ao-text) !important;}
+
+  /* ── Modal "Authorize" (abre branco por padrão) ─────────────────────────── */
+  .swagger-ui .dialog-ux .modal-ux{
+    background:var(--ao-panel) !important; border:1px solid var(--ao-border) !important;
+  }
+  .swagger-ui .dialog-ux .modal-ux-header{border-bottom:1px solid var(--ao-border) !important;}
+  .swagger-ui .dialog-ux .modal-ux-header h3,
+  .swagger-ui .dialog-ux .modal-ux-content h4,
+  .swagger-ui .dialog-ux .modal-ux-content p,
+  .swagger-ui .dialog-ux .modal-ux-content label{color:var(--ao-text) !important;}
+  .swagger-ui .dialog-ux .modal-ux-header .close-modal svg{fill:var(--ao-muted) !important;}
+
+  /* ── Botão copiar (clipboard) nos blocos de código ──────────────────────── */
+  .swagger-ui .copy-to-clipboard{
+    background:var(--ao-panel2) !important; border:1px solid var(--ao-border) !important;
+  }
+  .swagger-ui .opblock-description-wrapper p,
+  .swagger-ui .opblock-external-docs-wrapper p{color:var(--ao-muted) !important;}
 </style>
 """
 
