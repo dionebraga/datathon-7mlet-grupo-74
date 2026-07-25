@@ -1672,7 +1672,16 @@ def p_lift_curve(title: str) -> go.Figure:
             opacity=1.0 if is_best else 0.6,
             hovertemplate=f"<b>{POLICY_LABEL.get(name, name)}</b><br>step %{{x}}: +R$ %{{y:,.0f}} (IC 95%)<extra></extra>",
         ))
-    return style_panel(fig, title, height=GRID_H + 20)
+    # Legend OUTSIDE the plot (horizontal row below), not floating in a corner:
+    # at this panel's narrow real width, a 4-series corner legend box is wide
+    # enough to cover the busiest part of the data (confirmed by rendering the
+    # real chart) no matter which corner it anchors to. Below-the-axis is the
+    # only position that can never overlap a line, regardless of width.
+    fig = style_panel(fig, title, height=GRID_H + 58,
+                      legend_orientation="h", legend_x=0.5, legend_xanchor="center",
+                      legend_y=-0.24, legend_yanchor="top")
+    fig.update_layout(margin=dict(b=76))
+    return fig
 
 
 def _msprt_evalue(d: np.ndarray) -> np.ndarray:
@@ -1809,7 +1818,16 @@ def p_window_regret(title: str) -> go.Figure:
                      tickfont=dict(size=12, color=MUTED))
     fig.update_yaxes(tickformat=".3f", automargin=True,
                      tickfont=dict(size=12, color=MUTED))
-    return style_panel(fig, title, height=GRID_H + 20)
+    # Legend OUTSIDE the plot (horizontal, below) — same reasoning as
+    # p_lift_curve: a 5-series corner legend at this width covers real peaks
+    # (confirmed by rendering the real chart, e.g. LinThompson's t750 peak).
+    # Extra bottom room vs. p_lift_curve because the diagonal x tick labels
+    # ("t250"...) already claim some of that space.
+    fig = style_panel(fig, title, height=GRID_H + 70,
+                      legend_orientation="h", legend_x=0.5, legend_xanchor="center",
+                      legend_y=-0.42, legend_yanchor="top")
+    fig.update_layout(margin=dict(b=98))
+    return fig
 
 
 def p_policy_heatmap(title: str) -> go.Figure:
