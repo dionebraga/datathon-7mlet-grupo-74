@@ -67,7 +67,7 @@ cliente e retorna a oferta ótima segundo a política ativa, com rastreabilidade
 
 > 🎓 **FIAP 7MLET — Grupo 74** · Dione Braga
 
-**Stack:** 🐍 `Python` · ⚡ `FastAPI` · 🧠 `scikit-learn` · 🐼 `pandas` · 🔢 `NumPy` · 🔬 `MLflow` · 🖥️ `Streamlit` · 📈 `Plotly` · ▲ `Next.js` · ⚛️ `React` · 🧊 `Three.js` · ✨ `GSAP` · 🧪 `pytest`
+> **Stack:** `🐍 Python` · `⚡ FastAPI` · `🧠 scikit-learn` · `🐼 pandas` · `🔢 NumPy` · `🔬 MLflow` · `🖥️ Streamlit` · `📈 Plotly` · `▲ Next.js` · `⚛️ React` · `🧊 Three.js` · `✨ GSAP` · `🧪 pytest`
 
 ---
 
@@ -191,6 +191,14 @@ _SWAGGER_DARK_CSS = """
   .swagger-ui .renderedMarkdown code{
     background:var(--ao-panel) !important; color:#7CC4FF !important;
     border:1px solid var(--ao-border) !important; border-radius:4px !important;
+  }
+  /* Chips da linha "Stack:" — único blockquote com <code> na descrição, então
+     este seletor não atinge nenhum outro trecho (nomes de campo, /health etc.
+     seguem no tamanho normal). Ícone+nome no mesmo span, por isso crescem juntos. */
+  .swagger-ui .renderedMarkdown blockquote code{
+    font-size:1.3em !important; line-height:1.9 !important;
+    padding:.2em .55em !important; margin:0 .1em !important;
+    display:inline-block !important;
   }
   .swagger-ui .renderedMarkdown hr{border-color:var(--ao-border) !important;}
   .swagger-ui .renderedMarkdown table{border:1px solid var(--ao-border) !important;}
