@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 
 class ContextIn(BaseModel):
-    """Contexto de decisão do cliente.
+    """👤 Contexto de decisão do cliente.
 
     Forneça atributos brutos **OU** um ``client_event_id`` para resolução
     via feature store. Nenhum atributo protegido (LGPD) é aceito como
@@ -116,7 +116,7 @@ class ContextIn(BaseModel):
 
 
 class ReasonOut(BaseModel):
-    """Código de razão com descrição legível."""
+    """💡 Código de razão com descrição legível."""
 
     code: str = Field(description="Identificador do reason code.", examples=["MARGIN_WEIGHTED"])
     description: str = Field(
@@ -126,7 +126,7 @@ class ReasonOut(BaseModel):
 
 
 class DecisionOut(BaseModel):
-    """Registro auditável de uma decisão do bandit contextual."""
+    """🎯 Registro auditável de uma decisão do bandit contextual."""
 
     decision_id: str = Field(description="Identificador único da decisão.", examples=["dec_00000001"])
     ts: str = Field(description="Timestamp ISO 8601 da decisão.", examples=["2026-06-18T10:30:00Z"])
@@ -200,7 +200,7 @@ class DecisionOut(BaseModel):
 
 
 class OfferOut(BaseModel):
-    """Braço do catálogo de ofertas."""
+    """🎁 Braço do catálogo de ofertas."""
 
     offer_id: str = Field(description="ID da oferta.", examples=["OFF_LOAN_PREAPP"])
     name: str = Field(description="Nome comercial da oferta.", examples=["Empréstimo Pré-aprovado"])
@@ -213,7 +213,7 @@ class OfferOut(BaseModel):
 
 
 class PolicyOut(BaseModel):
-    """Política ativa no momento."""
+    """📄 Política ativa no momento."""
 
     name: str = Field(description="Nome da política.", examples=["linucb"])
     version: str = Field(description="Versão da política.", examples=["v1"])
@@ -225,7 +225,7 @@ class PolicyOut(BaseModel):
 
 
 class HealthOut(BaseModel):
-    """Status de saúde do serviço."""
+    """💓 Status de saúde do serviço."""
 
     status: str = Field(description="Status geral.", examples=["ok"])
     policy_loaded: bool = Field(description="Há uma política treinada carregada?")
@@ -239,7 +239,7 @@ class HealthOut(BaseModel):
 
 
 class MetricsOut(BaseModel):
-    """Matriz de métricas de uma política — usada para comparação."""
+    """📊 Matriz de métricas de uma política — usada para comparação."""
 
     policy: str = Field(description="Nome da política.", examples=["linucb"])
     cumulative_reward: float = Field(
@@ -269,7 +269,7 @@ class MetricsOut(BaseModel):
 
 
 class RegretCurveOut(BaseModel):
-    """Curva de regret para uma política — pontos (step, regret)."""
+    """📉 Curva de regret para uma política — pontos (step, regret)."""
 
     policy: str = Field(description="Nome da política.", examples=["linucb"])
     steps: list[int] = Field(description="Índices dos steps.")
@@ -277,7 +277,7 @@ class RegretCurveOut(BaseModel):
 
 
 class AssistantIn(BaseModel):
-    """Input para o assistente LLM+RAG."""
+    """💬 Input para o assistente LLM+RAG."""
 
     question: str = Field(
         ..., min_length=3,
@@ -295,7 +295,7 @@ class AssistantIn(BaseModel):
 
 
 class AssistantOut(BaseModel):
-    """Explicação do assistente LLM+RAG."""
+    """💬 Explicação do assistente LLM+RAG."""
 
     answer: str = Field(description="Resposta em linguagem natural.")
     provider: str = Field(description="Provedor LLM usado.", examples=["offline"])
@@ -305,14 +305,14 @@ class AssistantOut(BaseModel):
 
 
 class ErrorOut(BaseModel):
-    """Resposta de erro padronizada."""
+    """⚠️ Resposta de erro padronizada."""
 
     error: str = Field(description="Código do erro.", examples=["service_unavailable"])
     detail: str | None = Field(default=None, description="Detalhe da falha.")
 
 
 class AuditEntryOut(BaseModel):
-    """Entrada do log auditável de decisões."""
+    """🔎 Entrada do log auditável de decisões."""
 
     decision_id: str = Field(description="ID único da decisão.", examples=["dec_00000001"])
     ts: str = Field(description="Timestamp ISO 8601.", examples=["2026-06-20T10:30:00Z"])
@@ -327,21 +327,21 @@ class AuditEntryOut(BaseModel):
 
 
 class AuditSummaryOut(BaseModel):
-    """Resumo do log de auditoria."""
+    """📜 Resumo do log de auditoria."""
 
     total_decisions: int = Field(description="Total de decisões registradas.")
     entries: list[AuditEntryOut] = Field(description="Entradas (últimas N).")
 
 
 class DeleteOut(BaseModel):
-    """Confirmação de deleção."""
+    """🧹 Confirmação de deleção."""
 
     deleted: int = Field(description="Número de registros removidos.")
     message: str = Field(description="Mensagem de confirmação.")
 
 
 class PolicyVersionOut(BaseModel):
-    """Versão de política disponível em artifacts/."""
+    """📚 Versão de política disponível em artifacts/."""
 
     version: str = Field(description="Tag de versão.", examples=["v1"])
     policy: str = Field(description="Nome da política.", examples=["linucb"])
@@ -350,7 +350,7 @@ class PolicyVersionOut(BaseModel):
 
 
 class PolicySwitchIn(BaseModel):
-    """Corpo para troca de política ativa."""
+    """🔄 Corpo para troca de política ativa."""
 
     policy: str = Field(
         description="Nome da política a ativar.",
@@ -364,7 +364,7 @@ class PolicySwitchIn(BaseModel):
 
 
 class SimulateIn(BaseModel):
-    """Parâmetros de simulação on-demand."""
+    """▶️ Parâmetros de simulação on-demand."""
 
     horizon: int = Field(
         default=2000, ge=100, le=20000,
@@ -381,7 +381,7 @@ class SimulateIn(BaseModel):
 
 
 class SimulateOut(BaseModel):
-    """Resultado de simulação on-demand."""
+    """▶️ Resultado de simulação on-demand."""
 
     horizon: int
     seed: int

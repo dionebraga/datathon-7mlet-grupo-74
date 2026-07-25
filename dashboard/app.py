@@ -1452,16 +1452,16 @@ _conv_raw = np.asarray(best_res.converted, dtype=float)
 _smooth_w = max(1, len(_conv_raw) // 30)  # rolling window ≈ 3% of horizon
 conv_curve = np.convolve(_conv_raw, np.ones(_smooth_w) / _smooth_w, mode="same")
 lift_curve = best_res.cumulative_reward - base_res.cumulative_reward
-tile(k1, "Reward / 1k impressões", f"R$ {best['reward_per_1k']:,.0f}", best_res.cumulative_reward, VIOLET,
+tile(k1, "💰 Reward / 1k impressões", f"R$ {best['reward_per_1k']:,.0f}", best_res.cumulative_reward, VIOLET,
      desc="Receita total ÷ 1.000 rodadas · proxy de RPM financeiro · "
           "<b>↑ maior = política mais lucrativa</b>")
-tile(k2, "Regret ratio", f"{best['regret_ratio']:.1%}", best_res.cumulative_regret, RED,
+tile(k2, "📉 Regret ratio", f"{best['regret_ratio']:.1%}", best_res.cumulative_regret, RED,
      desc="% receita perdida vs oráculo ótimo (hindsight) · mede sub-optimalidade residual · "
           "<b>↓ menor = aprendizado mais eficiente</b>")
-tile(k3, "Conversão", f"{best['conversion_rate']:.1%}", conv_curve, CYAN,
+tile(k3, "🛒 Conversão", f"{best['conversion_rate']:.1%}", conv_curve, CYAN,
      desc="Fração acumulada de rodadas com conversão real · calibrado em 20k clientes UCI · "
           "<b>↑ maior = melhor seleção de oferta</b>")
-tile(k4, "Lift vs baseline", f"+{best.get('lift_vs_baseline_pct', 0):.0f}%", lift_curve, GREEN,
+tile(k4, "🚀 Lift vs baseline", f"+{best.get('lift_vs_baseline_pct', 0):.0f}%", lift_curve, GREEN,
      desc="Ganho incremental de receita vs greedy puro · prova o valor do aprendizado contextual · "
           "<b>↑ positivo = bandit supera baseline</b>")
 
