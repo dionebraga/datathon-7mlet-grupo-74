@@ -167,7 +167,7 @@ st.set_page_config(page_title="Adaptive Offers · Observability",
 
 # Paleta: dark navy base + electric blue + vivid green + gold + orange-red
 # Complementa o visual dark com a paleta BR (azul marinho, verde, ouro, laranja).
-BG     = "#000000"      # fundo puro
+BG     = "#060D1E"      # navy quase-preto (não puro-preto: dá contraste pro caracol "aparecer")
 PANEL  = "#030D24"      # navy panel (novo — dá profundidade)
 PANEL2 = "#010A1A"      # navy mais escuro
 GRID   = "#0D1F42"      # navy grid lines
@@ -262,14 +262,17 @@ def mini_sparkline_svg(values, width: int = 132, height: int = 34, color: str = 
 
 
 @st.cache_resource(show_spinner=False)
-def avatar_b64() -> str | None:
+def avatar_b64(target: int = 160) -> str | None:
     """Creator photo, base64-encoded for inline <img>, or None if the file
     isn't there yet (caller falls back to initials). Reads the same
     frontend/public/avatar.png the API and frontend serve -- single source
     of truth, not a separate copy -- so there's nothing to keep in sync.
-    Crop box assumes a portrait with the face in the upper-left area (the
-    photo in use at the time this was written); a differently-composed
-    photo would need the box adjusted."""
+    Crop replicates CSS `object-fit:cover; object-position:center top`
+    (the same rule the Swagger header badge uses via background-image) so
+    both surfaces frame the photo identically instead of two independently
+    hand-picked boxes drifting apart. ``target`` lets the sidebar's small
+    circular badge and the click-to-enlarge link share this one cropper
+    instead of hardcoding two boxes."""
     path = ROOT / "frontend" / "public" / "avatar.png"
     if not path.exists():
         return None
@@ -279,10 +282,13 @@ def avatar_b64() -> str | None:
     from PIL import Image
     img = Image.open(path).convert("RGB")
     w, h = img.size
-    box = (int(w * .117), int(h * .013), int(w * .633), int(h * .427))
-    thumb = img.crop(box).resize((160, 160), Image.LANCZOS)
+    scale = max(target / w, target / h)
+    crop_w = crop_h = target / scale
+    left = (w - crop_w) / 2
+    box = (int(left), 0, int(left + crop_w), int(crop_h))
+    thumb = img.crop(box).resize((target, target), Image.LANCZOS)
     buf = BytesIO()
-    thumb.save(buf, format="JPEG", quality=87)
+    thumb.save(buf, format="JPEG", quality=87 if target <= 200 else 90)
     return base64.b64encode(buf.getvalue()).decode("ascii")
 
 
@@ -589,15 +595,15 @@ st.markdown(
                -webkit-mask-size:0% 0%; mask-size:0% 0%;}}
         50%  {{opacity:.42; transform:scale(1.05);
                -webkit-mask-size:220% 220%; mask-size:220% 220%;}}
-        75%  {{opacity:.20;}}
-        100% {{opacity:.20; transform:scale(1.06);
+        75%  {{opacity:.34;}}
+        100% {{opacity:.34; transform:scale(1.06);
                -webkit-mask-size:340% 340%; mask-size:340% 340%;}}}}
       @keyframes heroDrift {{
         0%   {{transform:scale(1.06) translate3d(0,0,0);}}
         50%  {{transform:scale(1.12) translate3d(-1.6%,1.1%,0);}}
         100% {{transform:scale(1.09) translate3d(1.6%,-1.1%,0);}}}}
       @media (prefers-reduced-motion: reduce) {{
-        .stApp::before {{animation:none; opacity:.20;
+        .stApp::before {{animation:none; opacity:.34;
           filter:none; -webkit-mask:none; mask:none;}}}}
       /* ── Layout base ─────────────────────────────────────────── */
       .block-container {{padding-top:0.35rem;padding-bottom:1.6rem;max-width:1600px;}}
@@ -1059,10 +1065,10 @@ def tile(col, label: str, value: str, series, color: str, desc: str = "") -> Non
         annotations=[
             {"text": label.upper(), "x": 0.01, "y": 1.0, "xref": "paper", "yref": "paper",
              "showarrow": False, "xanchor": "left", "yanchor": "bottom",
-             "font": {"size": 15, "color": MUTED, "family": "Inter"}},
+             "font": {"size": 12.5, "color": MUTED, "family": "Inter"}},
             {"text": value, "x": 0.01, "y": 0.68, "xref": "paper", "yref": "paper",
              "showarrow": False, "xanchor": "left",
-             "font": {"size": 44, "color": color, "family": "Inter", "weight": 800}},
+             "font": {"size": 38, "color": color, "family": "Inter", "weight": 800}},
         ],
     )
     col.plotly_chart(fig, config={**NO_BAR, "scrollZoom": False}, **fill())
@@ -1117,7 +1123,7 @@ def gauge(value: float, title: str, vmax: float, color: str, suffix: str = "",
         delta=delta_cfg,
         number={
             "suffix": suffix,
-            "font": {"size": 44, "color": color, "family": "Inter"},
+            "font": {"size": 38, "color": color, "family": "Inter"},
             "valueformat": ".1f",
         },
         title={
@@ -1173,7 +1179,7 @@ def style_panel(fig: go.Figure, title: str, height: int = 260,
     fig.update_layout(
         template="plotly_dark", height=height,
         title={"text": f"<b>{title}</b>",
-               "font": {"size": 16, "color": TEXT, "family": "Inter"},
+               "font": {"size": 14, "color": TEXT, "family": "Inter"},
                "x": 0.01, "xanchor": "left", "pad": {"b": 6}},
         margin={"l": 16, "r": 16, "t": 52, "b": 32, "autoexpand": True},
         paper_bgcolor="rgba(0,0,0,0)",
@@ -1321,10 +1327,13 @@ with st.sidebar:
     # ── Criadora ─────────────────────────────────────────────────────────────
     _avatar = avatar_b64()
     _avatar_html = (
+        f'<a href="data:image/jpeg;base64,{avatar_b64(480)}" target="_blank" '
+        f'title="Abrir foto em tamanho maior" style="display:block;flex-shrink:0;'
+        f'cursor:pointer">'
         f'<img src="data:image/jpeg;base64,{_avatar}" width="38" height="38" '
-        f'style="width:38px;height:38px;border-radius:999px;flex-shrink:0;'
+        f'style="width:38px;height:38px;border-radius:999px;'
         f'object-fit:cover;object-position:center top;display:block;'
-        f'border:1px solid {hex_rgba(CYAN,.35)}"/>'
+        f'border:1px solid {hex_rgba(CYAN,.35)}"/></a>'
         if _avatar else
         f'<div style="width:38px;height:38px;border-radius:999px;flex-shrink:0;'
         f'display:flex;align-items:center;justify-content:center;font-weight:800;'
@@ -1532,17 +1541,28 @@ st.markdown(
     f'para decisão de ofertas financeiras em tempo real · '
     f'política ativa <b style="color:{CYAN}">{_active_pol}</b></div>'
     '</div>'
-    '<div class="hero-badges">'
+    '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0">'
+    '<div class="hero-badges" style="margin:0">'
     f'<span class="stat {"on" if api_up else "off"}">API REST {"●" if api_up else "○"}</span>'
     f'<span class="stat {"on" if mlf_up else "off"}">MLflow {"●" if mlf_up else "○"}</span>'
     '<span class="stat on">BI Dashboard ●</span>'
     '</div>'
-    f'<div style="margin-top:10px;padding-top:10px;border-top:1px solid {hex_rgba(CYAN,.18)};'
-    f'display:flex;align-items:center;justify-content:flex-end;gap:8px">'
-    f'<span style="color:{MUTED};font-size:.68rem;font-weight:700;letter-spacing:.04em">'
-    f'REWARD ACUMULADO</span>'
-    f'{mini_sparkline_svg(best_res.cumulative_reward, color=CYAN)}'
-    f'</div></div>',
+    f'<div style="padding-top:10px;border-top:1px solid {hex_rgba(CYAN,.18)};width:100%;'
+    f'display:flex;align-items:center;justify-content:flex-end;gap:12px;white-space:nowrap">'
+    f'<div style="text-align:right;white-space:nowrap">'
+    f'<div style="color:{MUTED};font-size:.68rem;font-weight:700;letter-spacing:.04em;white-space:nowrap">'
+    f'REWARD ACUMULADO</div>'
+    f'<div style="display:flex;align-items:baseline;gap:6px;justify-content:flex-end;'
+    f'margin-top:2px;white-space:nowrap">'
+    f'<span style="color:{TEXT};font-size:1.02rem;font-weight:800;white-space:nowrap">'
+    f'R$ {best["reward_per_1k"]:,.0f}</span>'
+    f'<span style="color:{GREEN if best.get("lift_vs_baseline_pct", 0) >= 0 else RED};'
+    f'font-size:.70rem;font-weight:700;white-space:nowrap">'
+    f'{"+" if best.get("lift_vs_baseline_pct", 0) >= 0 else ""}'
+    f'{best.get("lift_vs_baseline_pct", 0):.0f}% vs baseline</span>'
+    f'</div></div>'
+    f'<span style="flex-shrink:0">{mini_sparkline_svg(best_res.cumulative_reward, width=130, height=38, color=CYAN)}</span>'
+    f'</div></div></div>',
     unsafe_allow_html=True,
 )
 
@@ -1595,7 +1615,7 @@ def p_lollipop(value_col: str, title: str, money: bool = False,
     fmt = lambda v: f"R$ {v:,.0f}" if money else (f"{v:.1%}" if v < 1 else f"{v:,.1f}")
     txt = [fmt(v) for v in values]
     max_v = max(values) if values else 1
-    x_max = max_v * 1.65
+    x_max = max_v * 2.2
     fig = go.Figure()
     # optional reference zone (e.g. ideal exploration 10-20%)
     if ref_zone:
@@ -2879,8 +2899,8 @@ if st.button("🚀 Decidir oferta", type="primary", **fill()):
         "<style>"
         f"@keyframes heroRegrow{_dn}{{"
         "0%{opacity:0;-webkit-mask-size:0% 0%;mask-size:0% 0%;transform:scale(1.04);}"
-        "60%{opacity:.20;}"
-        "100%{opacity:.20;-webkit-mask-size:340% 340%;mask-size:340% 340%;transform:scale(1.06);}}"
+        "60%{opacity:.34;}"
+        "100%{opacity:.34;-webkit-mask-size:340% 340%;mask-size:340% 340%;transform:scale(1.06);}}"
         ".stApp::before{"
         f"animation:heroRegrow{_dn} 2.4s cubic-bezier(.2,.7,.2,1) both,"
         "heroDrift 46s ease-in-out 2.4s infinite alternate !important;}"
