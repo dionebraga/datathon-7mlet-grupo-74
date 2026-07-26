@@ -15,10 +15,11 @@ Run: ``adaptive-offers serve`` or ``uvicorn adaptive_offers.api.main:app``.
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 
 from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 
 from adaptive_offers.api.schemas import (
     AssistantOut,
@@ -112,6 +113,12 @@ Antes de selecionar o braço, o serviço aplica filtros de elegibilidade:
 
 Toda decisão é registrada em `artifacts/decisions/audit.jsonl` com:
 `decision_id`, `ts`, `arm_id`, `score`, `explored`, `reason_codes`, `estimates`
+
+---
+
+## 👩‍💻 ML Engineer
+
+**Dione Braga** · [LinkedIn](https://www.linkedin.com/in/dionebraga/) · [📦 Repositório](https://github.com/dionebraga/datathon-7mlet-grupo-74)
 
 **FIAP 7MLET — Grupo 74** · Dione Braga · Licença MIT
 """
@@ -650,6 +657,16 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         """Logo vetorial da marca — usado como favicon e em páginas/branding."""
         return Response(content=_LOGO_SVG, media_type="image/svg+xml",
                         headers={"Cache-Control": "public, max-age=86400"})
+
+    @app.get("/avatar.jpg", include_in_schema=False)
+    def avatar() -> FileResponse:
+        """Foto da criadora — mesmo arquivo servido pelo frontend (frontend/public/avatar.jpg),
+        lido direto do disco pra não duplicar o binário em dois lugares."""
+        path = Path(__file__).resolve().parents[3] / "frontend" / "public" / "avatar.jpg"
+        if not path.exists():
+            raise HTTPException(404, "avatar.jpg ainda não foi adicionado em frontend/public/")
+        return FileResponse(path, media_type="image/jpeg",
+                            headers={"Cache-Control": "public, max-age=86400"})
 
     @app.get("/docs", include_in_schema=False)
     def custom_swagger() -> HTMLResponse:

@@ -1252,6 +1252,35 @@ with st.sidebar:
     )
     st.divider()
 
+    # ── Criadora ─────────────────────────────────────────────────────────────
+    # Avatar = iniciais por enquanto (placeholder até termos uma foto real);
+    # trocar por <img src="..."> quando o arquivo estiver disponível.
+    st.markdown(
+        f'<div style="display:flex;align-items:center;gap:10px;padding:2px 0 10px">'
+        f'<div style="width:38px;height:38px;border-radius:999px;flex-shrink:0;'
+        f'display:flex;align-items:center;justify-content:center;font-weight:800;'
+        f'font-size:.82rem;color:#fff;background:linear-gradient(135deg,{VIOLET},{CYAN});'
+        f'box-shadow:0 2px 8px {hex_rgba(CYAN,.35)}">DB</div>'
+        f'<div style="min-width:0">'
+        f'<div style="font-size:.86rem;font-weight:700;color:{TEXT};line-height:1.2">Dione Braga</div>'
+        f'<div style="font-size:.70rem;color:{MUTED};line-height:1.3">ML Engineer</div>'
+        f'</div></div>'
+        f'<div style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px">'
+        f'<a href="https://www.linkedin.com/in/dionebraga/" target="_blank" rel="noopener" '
+        f'style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;'
+        f'padding:3px 10px;border-radius:999px;background:{hex_rgba("#0A66C2",.16)};'
+        f'color:#5BA6FF;font-size:.70rem;font-weight:700;border:1px solid {hex_rgba("#0A66C2",.35)}">'
+        f'in&nbsp;LinkedIn</a>'
+        f'<a href="https://github.com/dionebraga/datathon-7mlet-grupo-74" target="_blank" rel="noopener" '
+        f'style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;'
+        f'padding:3px 10px;border-radius:999px;background:{hex_rgba(GREEN,.14)};'
+        f'color:{GREEN};font-size:.70rem;font-weight:700;border:1px solid {hex_rgba(GREEN,.32)}">'
+        f'📦&nbsp;Repositório</a>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+    st.divider()
+
     # ── Simulação ────────────────────────────────────────────────────────────
     st.markdown('<div class="side-sect">⚙️ Simulação</div>', unsafe_allow_html=True)
     new_horizon = st.select_slider(
@@ -1894,17 +1923,22 @@ def p_policy_heatmap(title: str) -> go.Figure:
     # Vertical labels (not diagonal): in a narrow 1-of-4 column, a diagonal tilt
     # visually leans into the neighbouring column's label and collides. Vertical
     # text stays within its own column's width regardless of chart width.
+    # side="bottom" (not "top"): Plotly's per-axis automargin never coordinates
+    # with a separately-positioned layout.title, so a top-side axis and the
+    # title fight over the same region and render on top of each other. Bottom
+    # keeps the two in physically separate parts of the figure -- title can
+    # never collide with tick text again, by construction, not by margin math.
     fig.update_xaxes(tickfont=dict(size=11, color=TEXT, family="Inter"), tickangle=-90,
-                     side="top", automargin=True)
+                     side="bottom", automargin=True)
     fig.update_yaxes(tickfont=dict(size=12, color=TEXT), automargin=True)
     fig.update_layout(
-        height=GRID_H + 100,
-        margin=dict(l=14, r=14, t=86, b=14, autoexpand=True),
+        height=GRID_H + 40,
+        margin=dict(l=14, r=14, t=46, b=14, autoexpand=True),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Inter", color=TEXT),
         title=dict(text=title, font=dict(size=15, color=TEXT), x=0.01, xanchor="left",
-                   pad=dict(b=6)),
+                   y=0.99, yanchor="top", pad=dict(b=6)),
         hoverlabel=dict(bgcolor="rgba(0,0,0,0.90)", bordercolor=CYAN,
                         font_size=14, font_family="Inter", font_color=TEXT),
     )

@@ -6,6 +6,7 @@ import { MetricCard } from "@/components/MetricCard";
 import { PolicyHeader } from "@/components/PolicyHeader";
 import { OffersGrid } from "@/components/OffersGrid";
 import { DecisionExplorer } from "@/components/DecisionExplorer";
+import { CreatorCredit } from "@/components/CreatorCredit";
 import { api } from "@/lib/api";
 import { brl, pct } from "@/lib/utils";
 import type { Health, Offer, Policy } from "@/lib/types";
@@ -69,6 +70,7 @@ export default function Page() {
       <footer className="pt-2 text-center text-xs text-muted">
         <b className="text-text">Adaptive Offers Platform</b> · © 2026{" "}
         <b className="text-primary-soft">Dione Braga</b> — Grupo 74 · FIAP Pós-Tech 7MLET · Licença MIT
+        <CreatorCredit />
       </footer>
     </main>
   );
