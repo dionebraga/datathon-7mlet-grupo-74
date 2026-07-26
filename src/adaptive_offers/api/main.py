@@ -195,6 +195,25 @@ _SWAGGER_DARK_CSS = """
     border-radius:0 8px 8px 0 !important; padding:10px 16px !important; margin:12px 0 !important;
   }
   .swagger-ui .renderedMarkdown blockquote p{color:var(--ao-text) !important;}
+  /* Foto da criadora no primeiro blockquote (o da linha "FIAP 7MLET... Dione
+     Braga") — :first-of-type isola esse blockquote específico dos outros
+     (fórmulas matemáticas, stack) sem precisar de classe/hook extra. */
+  .swagger-ui .renderedMarkdown blockquote:first-of-type{
+    display:flex !important; align-items:center !important; gap:12px !important;
+    justify-content:flex-start !important;
+  }
+  .swagger-ui .renderedMarkdown blockquote:first-of-type p{
+    text-align:left !important; margin:0 !important; flex:0 1 auto !important;
+  }
+  .swagger-ui .renderedMarkdown blockquote:first-of-type::before{
+    content:""; order:-1;
+    width:44px; height:44px; flex:0 0 44px;
+    border-radius:50%;
+    background-image:url("/avatar.png");
+    background-size:cover; background-position:center top;
+    border:2px solid rgba(26,111,255,.5);
+    box-shadow:0 2px 10px rgba(0,0,0,.4);
+  }
   .swagger-ui .renderedMarkdown code{
     background:var(--ao-panel) !important; color:#7CC4FF !important;
     border:1px solid var(--ao-border) !important; border-radius:4px !important;
@@ -658,14 +677,14 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         return Response(content=_LOGO_SVG, media_type="image/svg+xml",
                         headers={"Cache-Control": "public, max-age=86400"})
 
-    @app.get("/avatar.jpg", include_in_schema=False)
+    @app.get("/avatar.png", include_in_schema=False)
     def avatar() -> FileResponse:
-        """Foto da criadora — mesmo arquivo servido pelo frontend (frontend/public/avatar.jpg),
+        """Foto da criadora — mesmo arquivo servido pelo frontend (frontend/public/avatar.png),
         lido direto do disco pra não duplicar o binário em dois lugares."""
-        path = Path(__file__).resolve().parents[3] / "frontend" / "public" / "avatar.jpg"
+        path = Path(__file__).resolve().parents[3] / "frontend" / "public" / "avatar.png"
         if not path.exists():
-            raise HTTPException(404, "avatar.jpg ainda não foi adicionado em frontend/public/")
-        return FileResponse(path, media_type="image/jpeg",
+            raise HTTPException(404, "avatar.png ainda não foi adicionado em frontend/public/")
+        return FileResponse(path, media_type="image/png",
                             headers={"Cache-Control": "public, max-age=86400"})
 
     @app.get("/docs", include_in_schema=False)

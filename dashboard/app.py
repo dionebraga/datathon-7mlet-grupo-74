@@ -261,6 +261,31 @@ def mini_sparkline_svg(values, width: int = 132, height: int = 34, color: str = 
     )
 
 
+@st.cache_resource(show_spinner=False)
+def avatar_b64() -> str | None:
+    """Creator photo, base64-encoded for inline <img>, or None if the file
+    isn't there yet (caller falls back to initials). Reads the same
+    frontend/public/avatar.png the API and frontend serve -- single source
+    of truth, not a separate copy -- so there's nothing to keep in sync.
+    Crop box assumes a portrait with the face in the upper-left area (the
+    photo in use at the time this was written); a differently-composed
+    photo would need the box adjusted."""
+    path = ROOT / "frontend" / "public" / "avatar.png"
+    if not path.exists():
+        return None
+    import base64
+    from io import BytesIO
+
+    from PIL import Image
+    img = Image.open(path).convert("RGB")
+    w, h = img.size
+    box = (int(w * .117), int(h * .013), int(w * .633), int(h * .427))
+    thumb = img.crop(box).resize((160, 160), Image.LANCZOS)
+    buf = BytesIO()
+    thumb.save(buf, format="JPEG", quality=87)
+    return base64.b64encode(buf.getvalue()).decode("ascii")
+
+
 def _hero_bg_layer() -> str:
     """Bakes ML training formulas into the hero-bg image (caracol tube).
 
@@ -564,15 +589,15 @@ st.markdown(
                -webkit-mask-size:0% 0%; mask-size:0% 0%;}}
         50%  {{opacity:.42; transform:scale(1.05);
                -webkit-mask-size:220% 220%; mask-size:220% 220%;}}
-        75%  {{opacity:.28;}}
-        100% {{opacity:.32; transform:scale(1.06);
+        75%  {{opacity:.20;}}
+        100% {{opacity:.20; transform:scale(1.06);
                -webkit-mask-size:340% 340%; mask-size:340% 340%;}}}}
       @keyframes heroDrift {{
         0%   {{transform:scale(1.06) translate3d(0,0,0);}}
         50%  {{transform:scale(1.12) translate3d(-1.6%,1.1%,0);}}
         100% {{transform:scale(1.09) translate3d(1.6%,-1.1%,0);}}}}
       @media (prefers-reduced-motion: reduce) {{
-        .stApp::before {{animation:none; opacity:.32;
+        .stApp::before {{animation:none; opacity:.20;
           filter:none; -webkit-mask:none; mask:none;}}}}
       /* ── Layout base ─────────────────────────────────────────── */
       .block-container {{padding-top:0.35rem;padding-bottom:1.6rem;max-width:1600px;}}
@@ -1294,20 +1319,29 @@ with st.sidebar:
     st.divider()
 
     # ── Criadora ─────────────────────────────────────────────────────────────
-    # Avatar = iniciais por enquanto (placeholder até termos uma foto real);
-    # trocar por <img src="..."> quando o arquivo estiver disponível.
-    st.markdown(
-        f'<div style="display:flex;align-items:center;gap:10px;padding:2px 0 10px">'
+    _avatar = avatar_b64()
+    _avatar_html = (
+        f'<img src="data:image/jpeg;base64,{_avatar}" width="38" height="38" '
+        f'style="width:38px;height:38px;border-radius:999px;flex-shrink:0;'
+        f'object-fit:cover;object-position:center top;display:block;'
+        f'border:1px solid {hex_rgba(CYAN,.35)}"/>'
+        if _avatar else
         f'<div style="width:38px;height:38px;border-radius:999px;flex-shrink:0;'
         f'display:flex;align-items:center;justify-content:center;font-weight:800;'
         f'font-size:.82rem;color:{CYAN};'
         f'background:linear-gradient(135deg,{hex_rgba(VIOLET,.22)},{hex_rgba(CYAN,.22)});'
         f'border:1px solid {hex_rgba(CYAN,.35)}">DB</div>'
+    )
+    st.markdown(
+        f'<div style="background:{hex_rgba(CYAN,.05)};border:1px solid {hex_rgba(CYAN,.16)};'
+        f'border-radius:12px;padding:10px 12px 12px">'
+        f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">'
+        f'{_avatar_html}'
         f'<div style="min-width:0">'
         f'<div style="font-size:.86rem;font-weight:700;color:{TEXT};line-height:1.2">Dione Braga</div>'
         f'<div style="font-size:.70rem;color:{MUTED};line-height:1.3">ML Engineer</div>'
         f'</div></div>'
-        f'<div style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px">'
+        f'<div style="display:flex;flex-wrap:wrap;gap:6px">'
         f'<a href="https://www.linkedin.com/in/dionebraga/" target="_blank" rel="noopener" '
         f'style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;'
         f'padding:3px 10px;border-radius:999px;background:{hex_rgba("#0A66C2",.16)};'
@@ -1318,7 +1352,7 @@ with st.sidebar:
         f'padding:3px 10px;border-radius:999px;background:{hex_rgba(GREEN,.14)};'
         f'color:{GREEN};font-size:.70rem;font-weight:700;border:1px solid {hex_rgba(GREEN,.32)}">'
         f'📦&nbsp;Repositório</a>'
-        f'</div>',
+        f'</div></div>',
         unsafe_allow_html=True,
     )
     st.divider()
@@ -2845,8 +2879,8 @@ if st.button("🚀 Decidir oferta", type="primary", **fill()):
         "<style>"
         f"@keyframes heroRegrow{_dn}{{"
         "0%{opacity:0;-webkit-mask-size:0% 0%;mask-size:0% 0%;transform:scale(1.04);}"
-        "60%{opacity:.32;}"
-        "100%{opacity:.32;-webkit-mask-size:340% 340%;mask-size:340% 340%;transform:scale(1.06);}}"
+        "60%{opacity:.20;}"
+        "100%{opacity:.20;-webkit-mask-size:340% 340%;mask-size:340% 340%;transform:scale(1.06);}}"
         ".stApp::before{"
         f"animation:heroRegrow{_dn} 2.4s cubic-bezier(.2,.7,.2,1) both,"
         "heroDrift 46s ease-in-out 2.4s infinite alternate !important;}"

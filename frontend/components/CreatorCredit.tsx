@@ -1,14 +1,17 @@
+import Image from "next/image";
 import { Linkedin, Package } from "lucide-react";
 
-// Avatar is initials for now (placeholder until a real photo is provided) --
-// swap the div below for a <Image src="/avatar.jpg" .../> once available.
 export function CreatorCredit() {
   return (
     <div className="mt-3 flex flex-col items-center gap-2.5">
       <div className="flex items-center gap-2.5">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-primary/35 bg-gradient-to-br from-primary/20 to-cyan-400/20 text-xs font-extrabold text-primary-soft">
-          DB
-        </div>
+        <Image
+          src="/avatar.png"
+          alt="Dione Braga"
+          width={36}
+          height={36}
+          className="h-9 w-9 shrink-0 rounded-full border border-primary/35 object-cover object-top"
+        />
         <div className="text-left">
           <div className="text-sm font-bold text-text">Dione Braga</div>
           <div className="text-xs text-muted">ML Engineer</div>
