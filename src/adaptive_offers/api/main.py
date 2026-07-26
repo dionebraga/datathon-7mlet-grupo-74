@@ -66,7 +66,7 @@ _DESCRIPTION = """
 de receita em campanhas de ofertas financeiras. Cada request recebe o contexto do
 cliente e retorna a oferta ótima segundo a política ativa, com rastreabilidade completa.
 
-> 🎓 **FIAP 7MLET — Grupo 74** · Dione Braga
+> 🎓 **FIAP 7MLET — Grupo 74** · 👩‍💻 **Dione Braga** (ML Engineer) · [LinkedIn](https://www.linkedin.com/in/dionebraga/) · [📦 Repositório](https://github.com/dionebraga/datathon-7mlet-grupo-74)
 
 > **Stack:** `🐍 Python` · `⚡ FastAPI` · `🧠 scikit-learn` · `🐼 pandas` · `🔢 NumPy` · `🔬 MLflow` · `🖥️ Streamlit` · `📈 Plotly` · `▲ Next.js` · `⚛️ React` · `🧊 Three.js` · `✨ GSAP` · `🧪 pytest`
 

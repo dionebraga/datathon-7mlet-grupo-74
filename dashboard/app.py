@@ -575,7 +575,7 @@ st.markdown(
         .stApp::before {{animation:none; opacity:.32;
           filter:none; -webkit-mask:none; mask:none;}}}}
       /* ── Layout base ─────────────────────────────────────────── */
-      .block-container {{padding-top:1.2rem;padding-bottom:0.8rem;max-width:1600px;}}
+      .block-container {{padding-top:0.35rem;padding-bottom:1.6rem;max-width:1600px;}}
       [data-testid="stSidebar"] {{background:{PANEL2};border-right:1px solid rgba(255,255,255,.05);}}
       div[data-testid="column"] {{padding:0 8px;}}
       button[data-testid="StyledFullScreenButton"] {{display:none !important;}}
@@ -3368,14 +3368,16 @@ if st.button("🚀 Decidir oferta", type="primary", **fill()):
 
 st.divider()
 st.markdown(
-    f'<div style="text-align:center;color:{MUTED};font-size:.90rem;padding:12px 0 6px">'
+    f'<div style="text-align:center;color:{MUTED};font-size:.90rem;'
+    f'padding:14px 12px 30px;max-width:100%;overflow-wrap:break-word;line-height:1.7">'
     f'<b style="color:{TEXT}">Adaptive Offers Platform</b> · © 2026 '
     f'<b style="color:{CYAN}">Dione Braga</b> — Grupo 74 · FIAP Pós-Tech 7MLET'
     '<br/><span style="font-size:.82rem">Licença MIT · '
     '<a href="https://github.com/dionebraga/datathon-7mlet-grupo-74" '
     f'style="color:{MUTED};text-decoration:none">github.com/dionebraga/datathon-7mlet-grupo-74</a>'
     '</span>'
-    f'<br/><span style="font-size:.72rem;color:{hex_rgba(AMBER,.85)};font-family:monospace">'
+    f'<br/><span style="font-size:.72rem;color:{hex_rgba(AMBER,.85)};font-family:monospace;'
+    f'display:inline-block;margin-top:4px">'
     f'⚠ se esta linha não mudar após reiniciar, o processo antigo ainda está rodando → '
     f'{BUILD_MARKER}</span>'
     '</div>', unsafe_allow_html=True)
