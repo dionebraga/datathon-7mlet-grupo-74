@@ -1365,10 +1365,6 @@ with st.sidebar:
         f'</div></div>',
         unsafe_allow_html=True,
     )
-    if _avatar:
-        with st.popover("🔍 Ver foto ampliada", use_container_width=True):
-            import base64 as _b64
-            st.image(_b64.b64decode(avatar_b64(480)), width=260)
     st.divider()
 
     # ── Simulação ────────────────────────────────────────────────────────────
