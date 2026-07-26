@@ -2244,11 +2244,14 @@ st.markdown(
     '<b>Conversão por política</b>: % rodadas que resultaram em conversão real — métrica de qualidade de aprendizado.</div>',
     unsafe_allow_html=True,
 )
-b1, b2, b3, b4 = st.columns(4)
+# Duas colunas (não quatro): em 4-de-largura os rótulos de valor e títulos
+# ficavam espremidos; 2×2 dá ~2.5× a largura por gráfico, muito mais legível.
+b1, b2 = st.columns(2)
 b1.plotly_chart(p_lollipop("cumulative_reward", "💰 Valor acumulado por política", money=True), config=NO_BAR, **fill())
 _rf = style_panel(regret_fig, "📉 Regret acumulado", height=GRID_H + 20)
 _rf.update_layout(legend=dict(x=0.02, y=0.98, xanchor="left", yanchor="top"))
 b2.plotly_chart(_rf, config=NO_BAR, **fill())
+b3, b4 = st.columns(2)
 b3.plotly_chart(p_arms_bar(pulls_named.index, pulls_named.values, "🎯 Pulls por oferta",
                             [VIOLET, CYAN, GREEN, GOLD, AMBER, RED]),
                 config=NO_BAR, **fill())
@@ -2345,13 +2348,15 @@ st.markdown(
     '<b>Heatmap multi-métrica</b>: intensidade de cor = posição relativa normalizada 0–100 entre políticas; valor exato dentro de cada célula.</div>',
     unsafe_allow_html=True,
 )
-c1, c2, c3, c4 = st.columns([1, 1, 1, 2])
+# 2×2 em vez de 4-de-largura (a legenda das curvas e os rótulos do lollipop
+# não cabiam em 1/4 de largura). O heatmap ganha metade da tela — mais que os
+# 40% que tinha antes.
+c1, c2 = st.columns(2)
 c1.plotly_chart(p_lift_curve("📈 Lift cumulativo vs baseline"), config=NO_BAR, **fill())
 c2.plotly_chart(p_window_regret("⚡ Regret por janela (convergência)"), config=NO_BAR, **fill())
+c3, c4 = st.columns(2)
 c3.plotly_chart(p_lollipop("exploration_rate", "🔍 Taxa de exploração",
                             ref_zone=(0.10, 0.20), ref_label="zona ideal"), config=NO_BAR, **fill())
-# Heatmap gets ~2x the width of the others: 5 metrics x policies of exact-value
-# text genuinely needs more room than a 1-of-4 equal column ever gives it.
 c4.plotly_chart(p_policy_heatmap("🔢 Comparação multi-métrica"), config=NO_BAR, **fill())
 
 # Segunda linha — dinâmica temporal do aprendizado (exploração e convergência)
@@ -2598,12 +2603,13 @@ st.markdown(
     '<b>Correlação</b>: heatmap Pearson entre features numéricas e variável alvo.</div>',
     unsafe_allow_html=True,
 )
-d1, d2, d3, d4 = st.columns([1, 1, 1, 2.3])
+# 2×2 em vez de 4-de-largura — os títulos ("Conversão · canal de contato") e os
+# eixos-x com ângulo ficavam cortados em 1/4 de largura.
+d1, d2 = st.columns(2)
 d1.plotly_chart(p_lollipop_v(by_pout.index, by_pout.values, "Conversão · poutcome", CYAN), config=NO_BAR, **fill())
 d2.plotly_chart(p_bar_cat(by_contact.index, by_contact.values, "Conversão · canal de contato", GREEN), config=NO_BAR, **fill())
+d3, d4 = st.columns(2)
 d3.plotly_chart(p_lollipop_v(by_age.index.astype(str), by_age.values, "Conversão · faixa etária", AMBER), config=NO_BAR, **fill())
-# 5 metric columns (one more than the multi-metric heatmap) -> needs the most
-# room of the row; same reasoning as the "Comparação multi-métrica" fix.
 d4.plotly_chart(p_heatmap_corr(processed, "🔬 Correlação de features"), config=NO_BAR, **fill())
 
 # --- Grid row E: comparison + ops ------------------------------------------ #
