@@ -1325,15 +1325,16 @@ with st.sidebar:
     st.divider()
 
     # ── Criadora ─────────────────────────────────────────────────────────────
+    # Click-to-enlarge uses st.popover (renders inline, same page) instead of
+    # a data: URI link -- Chrome blocks/garbles top-level navigation to a
+    # data: URI opened via target="_blank", which showed the raw base64 text
+    # instead of the image.
     _avatar = avatar_b64()
     _avatar_html = (
-        f'<a href="data:image/jpeg;base64,{avatar_b64(480)}" target="_blank" '
-        f'title="Abrir foto em tamanho maior" style="display:block;flex-shrink:0;'
-        f'cursor:pointer">'
         f'<img src="data:image/jpeg;base64,{_avatar}" width="38" height="38" '
-        f'style="width:38px;height:38px;border-radius:999px;'
+        f'style="width:38px;height:38px;border-radius:999px;flex-shrink:0;'
         f'object-fit:cover;object-position:center top;display:block;'
-        f'border:1px solid {hex_rgba(CYAN,.35)}"/></a>'
+        f'border:1px solid {hex_rgba(CYAN,.35)}"/>'
         if _avatar else
         f'<div style="width:38px;height:38px;border-radius:999px;flex-shrink:0;'
         f'display:flex;align-items:center;justify-content:center;font-weight:800;'
@@ -1364,6 +1365,10 @@ with st.sidebar:
         f'</div></div>',
         unsafe_allow_html=True,
     )
+    if _avatar:
+        with st.popover("🔍 Ver foto ampliada", use_container_width=True):
+            import base64 as _b64
+            st.image(_b64.b64decode(avatar_b64(480)), width=260)
     st.divider()
 
     # ── Simulação ────────────────────────────────────────────────────────────
