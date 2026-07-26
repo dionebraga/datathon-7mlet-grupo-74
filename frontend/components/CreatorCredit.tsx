@@ -6,7 +6,7 @@ export function CreatorCredit() {
   return (
     <div className="mt-3 flex flex-col items-center gap-2.5">
       <div className="flex items-center gap-2.5">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-primary to-cyan-400 text-xs font-extrabold text-white shadow-lg shadow-primary/30">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-primary/35 bg-gradient-to-br from-primary/20 to-cyan-400/20 text-xs font-extrabold text-primary-soft">
           DB
         </div>
         <div className="text-left">

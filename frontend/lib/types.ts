@@ -42,6 +42,45 @@ export interface Decision {
   reason_codes: string[];
   reasons: Reason[];
   estimates: Record<string, number>;
+  scores: Record<string, number>;
+  segment_id: string;
+  segment_label: string;
+  channel_id: string;
+  channel_label: string;
+  nba_action: string;
+  nba_headline: string;
+  nba_message: string;
+  nba_cta: string;
+  protected_groups: Record<string, string>;
+}
+
+export interface PolicyMetrics {
+  policy: string;
+  cumulative_reward: number;
+  reward_per_1k: number;
+  cumulative_regret: number;
+  regret_ratio: number;
+  conversion_rate: number;
+  exploration_rate: number;
+  lift_vs_baseline_pct: number | null;
+}
+
+export interface AuditEntry {
+  decision_id: string;
+  ts: string;
+  arm_id: string;
+  arm_name: string | null;
+  score: number | null;
+  expected_reward: number | null;
+  explored: boolean | null;
+  policy_name: string | null;
+  policy_version: string | null;
+  reason_codes: string[];
+}
+
+export interface AuditSummary {
+  total_decisions: number;
+  entries: AuditEntry[];
 }
 
 export interface AssistantAnswer {

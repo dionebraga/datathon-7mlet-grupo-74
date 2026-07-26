@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { BarChart, Bot, Compass, Gift, Loader2, Percent, Sparkles, Target } from "lucide-react";
+import { Bot, Compass, Gift, Loader2, MessageSquareText, Percent, Radio, Sparkles, Target, UserRound } from "lucide-react";
 import { useState } from "react";
 import { Bar, BarChart as RechartBar, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardTitle } from "@/components/ui/Card";
@@ -141,11 +141,44 @@ export function DecisionExplorer({ offers }: { offers: Offer[] }) {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               {decision.reason_codes.map((c) => (
                 <Badge key={c}>{c}</Badge>
               ))}
+              {decision.segment_label && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white/5 px-2.5 py-1 text-[0.7rem] font-bold text-muted">
+                  <UserRound className="h-3 w-3" /> {decision.segment_label}
+                </span>
+              )}
+              {decision.channel_label && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white/5 px-2.5 py-1 text-[0.7rem] font-bold text-muted">
+                  <Radio className="h-3 w-3" /> {decision.channel_label}
+                </span>
+              )}
             </div>
+
+            {/* next-best-action message preview */}
+            {decision.nba_headline && (
+              <div className="card flex flex-col gap-2 border-primary/25 bg-primary/[0.04] p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <MessageSquareText className="mt-0.5 h-5 w-5 shrink-0 text-primary-soft" />
+                  <div>
+                    <div className="text-[0.68rem] font-bold uppercase tracking-wider text-muted">
+                      Próxima ação · {decision.nba_action || "mensagem"}
+                    </div>
+                    <div className="mt-0.5 font-bold text-text">{decision.nba_headline}</div>
+                    {decision.nba_message && (
+                      <p className="mt-1 max-w-xl text-sm text-muted">{decision.nba_message}</p>
+                    )}
+                  </div>
+                </div>
+                {decision.nba_cta && (
+                  <span className="inline-flex shrink-0 items-center justify-center rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white shadow-lg shadow-primary/25">
+                    {decision.nba_cta}
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* value breakdown + probability + reasons */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-6">

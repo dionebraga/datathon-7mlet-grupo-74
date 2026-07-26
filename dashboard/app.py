@@ -230,6 +230,37 @@ def logo_svg(size: int = 34, gid: str = "lg") -> str:
     )
 
 
+def mini_sparkline_svg(values, width: int = 132, height: int = 34, color: str = CYAN) -> str:
+    """Inline SVG sparkline -- no Plotly instance needed, so it can live inside
+    the same raw-HTML hero panel string instead of a separate st.plotly_chart
+    element that Streamlit would render outside the gradient card."""
+    vals = list(values)
+    if len(vals) > 40:
+        step = max(1, len(vals) // 40)
+        vals = vals[::step]
+    if len(vals) < 2:
+        return ""
+    vmin, vmax = min(vals), max(vals)
+    span = (vmax - vmin) or 1
+    pad = 3
+    n = len(vals)
+    pts = [
+        f"{(i / (n - 1)) * width:.1f},{pad + (1 - (v - vmin) / span) * (height - 2 * pad):.1f}"
+        for i, v in enumerate(vals)
+    ]
+    last_x, last_y = pts[-1].split(",")
+    area = f"0,{height} " + " ".join(pts) + f" {width},{height}"
+    return (
+        f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
+        f'style="display:block" xmlns="http://www.w3.org/2000/svg">'
+        f'<polyline points="{area}" fill="{hex_rgba(color, .16)}" stroke="none"/>'
+        f'<polyline points="{" ".join(pts)}" fill="none" stroke="{color}" stroke-width="1.8" '
+        f'stroke-linecap="round" stroke-linejoin="round"/>'
+        f'<circle cx="{last_x}" cy="{last_y}" r="2.8" fill="{color}" stroke="#000" stroke-width="1"/>'
+        f'</svg>'
+    )
+
+
 def _hero_bg_layer() -> str:
     """Bakes ML training formulas into the hero-bg image (caracol tube).
 
@@ -962,6 +993,16 @@ def tile(col, label: str, value: str, series, color: str, desc: str = "") -> Non
     n = len(s)
     # x axis: round indices scaled to readable labels
     x_idx = np.linspace(1, n, n).astype(int)
+    # Confine the sparkline to the bottom ~38% of the plot via an inflated
+    # y-axis range, instead of letting it autoscale to the full tile height.
+    # A volatile series (e.g. conversion rate) otherwise swings back and
+    # forth through paper-y=0.50, where the big value sits, and visually
+    # cuts through the number -- this guarantees separation regardless of
+    # how noisy any given metric's series is, not just a tuning for one tile.
+    _dmin, _dmax = float(np.min(s)), float(np.max(s))
+    _dspan = (_dmax - _dmin) or (abs(_dmax) * 0.1 or 1.0)
+    _y_floor = _dmin - _dspan * 0.08
+    _y_range = [_y_floor, _y_floor + (_dspan * 1.16) / 0.38]
     # Tooltip label depends on units
     if "R$" in value:
         hover_fmt = "round %{x}<br><b>R$ %{y:,.1f}</b><extra></extra>"
@@ -989,12 +1030,12 @@ def tile(col, label: str, value: str, series, color: str, desc: str = "") -> Non
         height=215,
         margin={"l": 8, "r": 8, "t": 56, "b": 8},
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        xaxis={"visible": False}, yaxis={"visible": False},
+        xaxis={"visible": False}, yaxis={"visible": False, "range": _y_range},
         annotations=[
             {"text": label.upper(), "x": 0.01, "y": 1.0, "xref": "paper", "yref": "paper",
              "showarrow": False, "xanchor": "left", "yanchor": "bottom",
              "font": {"size": 15, "color": MUTED, "family": "Inter"}},
-            {"text": value, "x": 0.01, "y": 0.50, "xref": "paper", "yref": "paper",
+            {"text": value, "x": 0.01, "y": 0.68, "xref": "paper", "yref": "paper",
              "showarrow": False, "xanchor": "left",
              "font": {"size": 44, "color": color, "family": "Inter", "weight": 800}},
         ],
@@ -1259,8 +1300,9 @@ with st.sidebar:
         f'<div style="display:flex;align-items:center;gap:10px;padding:2px 0 10px">'
         f'<div style="width:38px;height:38px;border-radius:999px;flex-shrink:0;'
         f'display:flex;align-items:center;justify-content:center;font-weight:800;'
-        f'font-size:.82rem;color:#fff;background:linear-gradient(135deg,{VIOLET},{CYAN});'
-        f'box-shadow:0 2px 8px {hex_rgba(CYAN,.35)}">DB</div>'
+        f'font-size:.82rem;color:{CYAN};'
+        f'background:linear-gradient(135deg,{hex_rgba(VIOLET,.22)},{hex_rgba(CYAN,.22)});'
+        f'border:1px solid {hex_rgba(CYAN,.35)}">DB</div>'
         f'<div style="min-width:0">'
         f'<div style="font-size:.86rem;font-weight:700;color:{TEXT};line-height:1.2">Dione Braga</div>'
         f'<div style="font-size:.70rem;color:{MUTED};line-height:1.3">ML Engineer</div>'
@@ -1460,7 +1502,13 @@ st.markdown(
     f'<span class="stat {"on" if api_up else "off"}">API REST {"●" if api_up else "○"}</span>'
     f'<span class="stat {"on" if mlf_up else "off"}">MLflow {"●" if mlf_up else "○"}</span>'
     '<span class="stat on">BI Dashboard ●</span>'
-    '</div></div>',
+    '</div>'
+    f'<div style="margin-top:10px;padding-top:10px;border-top:1px solid {hex_rgba(CYAN,.18)};'
+    f'display:flex;align-items:center;justify-content:flex-end;gap:8px">'
+    f'<span style="color:{MUTED};font-size:.68rem;font-weight:700;letter-spacing:.04em">'
+    f'REWARD ACUMULADO</span>'
+    f'{mini_sparkline_svg(best_res.cumulative_reward, color=CYAN)}'
+    f'</div></div>',
     unsafe_allow_html=True,
 )
 
@@ -2698,6 +2746,82 @@ def _feed_panel():
 
 _feed_panel()
 
+# --- Grid row F.5: Decision-log distribution stats --------------------------- #
+# Separate from the feed's own summary card (which only shows the mean and a
+# progress bar over the last 15 rows) -- this reads a much larger slice so the
+# histogram shape and the explore/exploit split are statistically meaningful,
+# not just a snapshot of the newest handful of decisions.
+st.markdown('<div class="sect">📊 Estatísticas do log de decisões</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="sect-desc">Distribuição de valores e proporção exploração/explotação '
+    'sobre uma amostra maior do log auditável (não só as últimas 15 do feed acima).</div>',
+    unsafe_allow_html=True,
+)
+
+
+def p_value_histogram(df: pd.DataFrame, title: str) -> go.Figure:
+    mean_v = df["Valor"].mean()
+    fig = go.Figure(go.Histogram(
+        x=df["Valor"], marker=dict(color=hex_rgba(CYAN, .75), line=dict(color=PANEL2, width=1)),
+        nbinsx=24,
+    ))
+    fig.add_vline(x=mean_v, line=dict(color=GOLD, width=2, dash="dash"),
+                 annotation_text=f"média R${mean_v:.0f}", annotation_position="top",
+                 annotation_font=dict(color=GOLD, size=11, family="Inter"))
+    fig.update_layout(
+        height=GRID_H - 40,
+        margin=dict(l=14, r=14, t=50, b=40),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter", color=TEXT),
+        title=dict(text=title, font=dict(size=15, color=TEXT), x=0.01, xanchor="left"),
+        xaxis=dict(title="Valor esperado (R$)", gridcolor=GRID, tickfont=dict(color=MUTED, size=11),
+                  automargin=True),
+        yaxis=dict(title="Nº de decisões", gridcolor=GRID, tickfont=dict(color=MUTED, size=11),
+                  automargin=True),
+        bargap=0.06,
+        hoverlabel=dict(bgcolor="rgba(0,0,0,0.90)", bordercolor=CYAN, font_size=12, font_family="Inter"),
+    )
+    return fig
+
+
+def p_explore_donut(df: pd.DataFrame, title: str) -> go.Figure:
+    n_e = int(df["Explorado"].sum())
+    n_x = len(df) - n_e
+    fig = go.Figure(go.Pie(
+        labels=["Exploração", "Explotação"], values=[n_e, n_x], hole=0.62,
+        marker=dict(colors=[CYAN, GREEN], line=dict(color="#000000", width=2)),
+        textinfo="percent", textfont=dict(color="#FFFFFF", size=13, family="Inter"),
+        hovertemplate="<b>%{label}</b><br>%{value} decisões (%{percent})<extra></extra>",
+    ))
+    fig.update_layout(
+        height=GRID_H - 40,
+        margin=dict(l=14, r=14, t=50, b=14),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter", color=TEXT),
+        title=dict(text=title, font=dict(size=15, color=TEXT), x=0.01, xanchor="left"),
+        showlegend=True,
+        legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.1, font=dict(color=MUTED, size=11)),
+        annotations=[dict(text=f"{len(df)}<br>decisões", x=0.5, y=0.5, showarrow=False,
+                          font=dict(size=15, color=TEXT, family="Inter"))],
+        hoverlabel=dict(bgcolor="rgba(0,0,0,0.90)", bordercolor=CYAN, font_size=12, font_family="Inter"),
+    )
+    return fig
+
+
+_stats_sample = recent_decisions(300)
+if _stats_sample.empty:
+    st.markdown(
+        f'<div style="text-align:center;padding:24px;color:{MUTED};font-size:.85rem">'
+        f'Sem decisões suficientes ainda para estatísticas de distribuição.</div>',
+        unsafe_allow_html=True,
+    )
+else:
+    g1, g2 = st.columns([7, 3])
+    g1.plotly_chart(p_value_histogram(_stats_sample, "💰 Distribuição do valor esperado por decisão"),
+                    config=NO_BAR, **fill())
+    g2.plotly_chart(p_explore_donut(_stats_sample, "🔍 Exploração vs Explotação"),
+                    config=NO_BAR, **fill())
+
 # --------------------------------------------------------------------------- #
 # Decision explorer
 # --------------------------------------------------------------------------- #
@@ -3014,27 +3138,29 @@ if st.button("🚀 Decidir oferta", type="primary", **fill()):
             f'<div style="color:{TEXT};font-weight:700;font-size:15px;margin-bottom:12px;'
             f'padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.07)">'
             f'⚖️ Fórmula de valor esperado</div>'
-            f'<div style="display:flex;align-items:center;justify-content:space-around;'
-            f'text-align:center;gap:6px">'
-            f'<div>'
-            f'  <div style="font-size:2.0rem;font-weight:900;color:{CYAN};line-height:1">'
-            f'  {p_conv:.1%}</div>'
-            f'  <div style="color:{MUTED};font-size:.78rem;margin-top:5px">P(conv)</div>'
-            f'  <div style="color:{MUTED};font-size:.70rem">prob. conversão</div>'
+            f'<div style="display:flex;align-items:center;justify-content:space-between;'
+            f'text-align:center;gap:2px">'
+            f'<div style="min-width:0;flex:1">'
+            f'  <div style="font-size:1.35rem;font-weight:900;color:{CYAN};line-height:1;'
+            f'  white-space:nowrap">{p_conv:.1%}</div>'
+            f'  <div style="color:{MUTED};font-size:.68rem;margin-top:5px">P(conv)</div>'
+            f'  <div style="color:{MUTED};font-size:.62rem">prob. conversão</div>'
             f'</div>'
-            f'<div style="font-size:1.8rem;color:{MUTED};font-weight:200;line-height:1">×</div>'
-            f'<div>'
-            f'  <div style="font-size:2.0rem;font-weight:900;color:{GOLD};line-height:1">'
-            f'  R${p_margin:.0f}</div>'
-            f'  <div style="color:{MUTED};font-size:.78rem;margin-top:5px">Margem</div>'
-            f'  <div style="color:{MUTED};font-size:.70rem">valor da oferta</div>'
+            f'<div style="font-size:1.2rem;color:{MUTED};font-weight:200;line-height:1;'
+            f'flex-shrink:0">×</div>'
+            f'<div style="min-width:0;flex:1">'
+            f'  <div style="font-size:1.35rem;font-weight:900;color:{GOLD};line-height:1;'
+            f'  white-space:nowrap">R${p_margin:.0f}</div>'
+            f'  <div style="color:{MUTED};font-size:.68rem;margin-top:5px">Margem</div>'
+            f'  <div style="color:{MUTED};font-size:.62rem">valor da oferta</div>'
             f'</div>'
-            f'<div style="font-size:1.8rem;color:{MUTED};font-weight:200;line-height:1">=</div>'
-            f'<div>'
-            f'  <div style="font-size:2.0rem;font-weight:900;color:{GREEN};line-height:1">'
-            f'  R${p_conv*p_margin:.1f}</div>'
-            f'  <div style="color:{MUTED};font-size:.78rem;margin-top:5px">Valor esp.</div>'
-            f'  <div style="color:{MUTED};font-size:.70rem">reward esperado</div>'
+            f'<div style="font-size:1.2rem;color:{MUTED};font-weight:200;line-height:1;'
+            f'flex-shrink:0">=</div>'
+            f'<div style="min-width:0;flex:1">'
+            f'  <div style="font-size:1.35rem;font-weight:900;color:{GREEN};line-height:1;'
+            f'  white-space:nowrap">R${p_conv*p_margin:.1f}</div>'
+            f'  <div style="color:{MUTED};font-size:.68rem;margin-top:5px">Valor esp.</div>'
+            f'  <div style="color:{MUTED};font-size:.62rem">reward esperado</div>'
             f'</div>'
             f'</div></div>',
             unsafe_allow_html=True,

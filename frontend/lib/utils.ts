@@ -9,3 +9,11 @@ export const brl = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 1 });
 
 export const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
+
+export const POLICY_LABEL: Record<string, string> = {
+  linucb: "LinUCB",
+  thompson: "Thompson",
+  lin_thompson: "LinThompson",
+  nilos_ucb: "Nilos-UCB",
+  baseline: "Baseline",
+};

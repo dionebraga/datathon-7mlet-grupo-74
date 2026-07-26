@@ -6,6 +6,8 @@ import { MetricCard } from "@/components/MetricCard";
 import { PolicyHeader } from "@/components/PolicyHeader";
 import { OffersGrid } from "@/components/OffersGrid";
 import { DecisionExplorer } from "@/components/DecisionExplorer";
+import { PolicyComparison } from "@/components/PolicyComparison";
+import { DecisionHistory } from "@/components/DecisionHistory";
 import { CreatorCredit } from "@/components/CreatorCredit";
 import { api } from "@/lib/api";
 import { brl, pct } from "@/lib/utils";
@@ -62,6 +64,11 @@ export default function Page() {
           sub="decisões exploratórias" color="#f5a623" delay={0.2}
           trend={m.exploration_rate > 0.1 ? ">10%" : "<10%"}
           trendLabel={m.exploration_rate > 0.1 ? "boa exploração" : "conservadora"} trendUp={m.exploration_rate > 0.1} />
+      </section>
+
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <PolicyComparison activePolicy={policy?.name} />
+        <DecisionHistory />
       </section>
 
       <DecisionExplorer offers={offers} />

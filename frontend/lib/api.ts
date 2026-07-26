@@ -1,6 +1,15 @@
 // Thin client for the Adaptive Offers FastAPI. Requests go to /api/* which
 // next.config.mjs proxies to the Python backend (no CORS, backend untouched).
-import type { AssistantAnswer, ContextInput, Decision, Health, Offer, Policy } from "./types";
+import type {
+  AssistantAnswer,
+  AuditSummary,
+  ContextInput,
+  Decision,
+  Health,
+  Offer,
+  Policy,
+  PolicyMetrics,
+} from "./types";
 
 const BASE = "/api";
 
@@ -27,4 +36,6 @@ export const api = {
   decide: (ctx: ContextInput) => post<Decision>("/decide", ctx),
   explain: (ctx: ContextInput, question: string) =>
     post<AssistantAnswer>(`/assistant/explain?question=${encodeURIComponent(question)}`, ctx),
+  metrics: () => get<PolicyMetrics[]>("/metrics"),
+  audit: (n = 10) => get<AuditSummary>(`/audit?n=${n}`),
 };

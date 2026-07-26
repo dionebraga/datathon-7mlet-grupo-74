@@ -23,18 +23,21 @@ export function PolicyHeader({ health, policy }: { health?: Health; policy?: Pol
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="card flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"
+      className="card flex flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6"
     >
-      <div className="flex items-center gap-3">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary-soft sm:h-11 sm:w-11">
-          <Satellite className="h-5 w-5" />
+      <div className="flex items-center gap-3.5">
+        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary-soft shadow-lg shadow-primary/10 sm:h-12 sm:w-12">
+          <Satellite className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
         <div className="min-w-0">
-          <h1 className="text-base font-extrabold leading-tight tracking-tight sm:text-xl">
-            Adaptive Offers — Decision Console
+          <div className="text-[0.66rem] font-bold uppercase tracking-[0.16em] text-primary-soft/80 sm:text-xs">
+            FIAP Pós-Tech · 7MLET · Grupo 74
+          </div>
+          <h1 className="bg-gradient-to-r from-white via-primary-soft to-cyan-300 bg-clip-text text-xl font-extrabold leading-tight tracking-tight text-transparent sm:text-2xl">
+            Adaptive Offers
           </h1>
           <p className="text-xs text-muted sm:text-sm">
-            Multi-armed bandit · política ativa{" "}
+            Decision Console · política ativa{" "}
             <b className="text-text">
               {policy ? `${policy.name}@${policy.version}` : "—"}
             </b>
