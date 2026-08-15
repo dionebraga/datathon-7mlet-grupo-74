@@ -69,6 +69,12 @@ artifacts/
 # ---- Pitch deck build scratch (node_modules, render PNGs, scripts) ----
 .pptx-build/
 
+# ---- Material de apoio da gravação (orientação pessoal, não é entregável) ----
+# Roteiro e runbook do vídeo: notas de condução para quem grava, não documentação
+# do projeto. Ficam no disco, fora do repositório.
+docs/roteiro-gravacao.md
+docs/runbook-gravacao.md
+
 # ---- OS / editor ----
 .DS_Store
 Thumbs.db

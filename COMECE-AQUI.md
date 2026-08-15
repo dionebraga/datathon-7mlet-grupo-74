@@ -32,8 +32,8 @@ Aguarde **até 40 segundos** e abra:
 
 Para encerrar tudo: `.\stop.ps1`
 
-> 🎬 Vai **gravar o pitch**? Vá direto para o
-> [**roteiro de gravação**](docs/roteiro-gravacao.md) — ele tem o pré-voo completo.
+> 🎬 Vai **gravar o pitch**? Rode o pré-voo da [seção de verificação](#-verificar-que-está-tudo-saudável)
+> antes de abrir o gravador.
 
 ---
 
@@ -302,7 +302,6 @@ Os números do `train-all --horizon 6000` devem bater com o README §9 e o slide
 
 | Você quer… | Leia |
 |---|---|
-| 🎬 **Gravar o pitch** | [`docs/roteiro-gravacao.md`](docs/roteiro-gravacao.md) |
 | 📈 Explorar os experimentos | [`docs/mlflow-guia.md`](docs/mlflow-guia.md) |
 | 📖 Entender o projeto inteiro | [`README.md`](README.md) |
 | 📑 Ler o relatório técnico | [`reports/technical-report.md`](reports/technical-report.md) |

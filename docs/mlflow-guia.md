@@ -176,7 +176,7 @@ netsh interface ipv4 show excludedportrange protocol=tcp
 >
 > Se mesmo assim quiser padronizar na 5000, troque nestes arquivos:
 > `start.ps1`, `VER-MLFLOW.bat` (pasta externa), `README.md` §5 e §5.1,
-> `COMECE-AQUI.md`, `docs/roteiro-gravacao.md` e o **slide 10** do PPTX
+> `COMECE-AQUI.md` e o **slide 10** do PPTX
 > (via `scripts/sync_pptx_numbers.py`).
 
 ---

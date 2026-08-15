@@ -294,7 +294,6 @@ ANTHROPIC_MODEL=claude-opus-4-8           # qualidade máxima (ou claude-haiku-4
 | 📄 Documento | Conteúdo |
 |---|---|
 | [**COMECE-AQUI.md**](COMECE-AQUI.md) | 🚀 **Do zero até as 4 telas no ar** — instalação, pipeline, portas e troubleshooting |
-| [docs/roteiro-gravacao.md](docs/roteiro-gravacao.md) | 🎬 Roteiro do pitch (10 min + 5 min Q&A) — pré-voo, minuto a minuto, banco de respostas |
 | [docs/mlflow-guia.md](docs/mlflow-guia.md) | 📈 6 formas de acessar o MLflow + troubleshooting |
 | [docs/architecture-azure.md](docs/architecture-azure.md) | ☁️ Arquitetura-alvo Azure (Mermaid, serviços, FinOps) |
 | [docs/feature-store.md](docs/feature-store.md) | 🗄️ Feature Store offline/online |

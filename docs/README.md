@@ -13,7 +13,6 @@
 | Documento | Descrição |
 |---|---|
 | [🚀 COMECE-AQUI.md](../COMECE-AQUI.md) | **Do zero até as 4 telas no ar** — pasta certa, instalação, pipeline, portas, atalhos `.bat` e troubleshooting. |
-| [🎬 roteiro-gravacao.md](roteiro-gravacao.md) | **Roteiro do pitch (10 min + 5 min Q&A)** — pré-voo, ordem das janelas, roteiro minuto a minuto, banco de respostas e plano B. |
 | [📈 mlflow-guia.md](mlflow-guia.md) | **6 formas de acessar o MLflow** — UI, terminal, API Python, filtros, o que é registrado e troubleshooting. |
 
 ## ☁️ Arquitetura & Plataforma
@@ -44,7 +43,6 @@
 | Documento | Descrição |
 |---|---|
 | [🎯 Adaptive-Offers-Pitch-Grupo74.pdf](Adaptive-Offers-Pitch-Grupo74.pdf) | Slides do pitch (10 min + 5 min Q&A) — problema, abordagem, demonstração, evidências, riscos, governança, impacto e FinOps. |
-| [🎬 roteiro-gravacao.md](roteiro-gravacao.md) | Roteiro da gravação: pré-voo, o que falar em cada minuto, o que mostrar em cada tela e o banco de respostas do Q&A. |
 
 ---
 
