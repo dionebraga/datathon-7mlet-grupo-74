@@ -192,7 +192,7 @@ adaptive-offers decide --context examples\context_sample.json
 | `adaptive-offers decide` | 5 | Decisão auditável com reason codes |
 | `adaptive-offers serve` | 5 | Sobe a API REST |
 | `adaptive-offers monitor` | 7 | Relatório HTML de drift e fairness |
-| `pytest` | — | 93 testes (unit + integração) |
+| `pytest` | — | 95 testes (unit + integração) |
 
 > 💾 **Sem credenciais do Kaggle?** O carregador usa um **gerador determinístico**
 > que reproduz o *schema* da base — todo o pipeline roda offline. Para usar a base
@@ -262,7 +262,7 @@ ANTHROPIC_MODEL=claude-opus-4-8
 ## ✅ Verificar que está tudo saudável
 
 ```powershell
-pytest -q                 # esperado: 93 passed
+pytest -q                 # esperado: 95 passed
 ruff check src tests      # esperado: All checks passed!
 python -c "import adaptive_offers; print('OK')"
 python scripts\mlflow_report.py --compare    # tabela de runs

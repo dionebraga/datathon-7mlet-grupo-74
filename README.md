@@ -11,7 +11,7 @@
 <br/>
 
 [![CI](https://github.com/dionebraga/datathon-7mlet-grupo-74/actions/workflows/ci.yml/badge.svg)](https://github.com/dionebraga/datathon-7mlet-grupo-74/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-93%20passed-brightgreen?style=flat&logo=pytest&logoColor=white)](tests/)
+[![Tests](https://img.shields.io/badge/tests-95%20passed-brightgreen?style=flat&logo=pytest&logoColor=white)](tests/)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-success?style=flat&logo=ruff&logoColor=white)](https://docs.astral.sh/ruff/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat)](LICENSE)
 [![Version](https://img.shields.io/badge/version-0.8.0-blue?style=flat)](pyproject.toml)
@@ -108,7 +108,7 @@ datathon-7mlet-grupo-74/
 │   └── responsible.py             # atributos protegidos + fairness por grupo
 ├── 📊 dashboard/                  # BI (Streamlit)
 ├── 🎨 frontend/                   # Console de decisão (Next.js + Tailwind v4 — bônus, consome a API)
-└── ✅ tests/                      # unit/ + integration/ (93 testes)
+└── ✅ tests/                      # unit/ + integration/ (95 testes)
 ```
 
 ### 📈 Como ler o histórico de commits
@@ -287,12 +287,13 @@ ANTHROPIC_MODEL=claude-opus-4-8           # qualidade máxima (ou claude-haiku-4
 | `adaptive-offers serve` | 5 | API com contrato documentado e tratamento de erro |
 | `adaptive-offers monitor` | 7 | Relatório HTML de drift/fairness (EvidentlyAI opcional) |
 | `adaptive-offers pipeline --rows 20000` | 1–4 | **Tudo em um comando** (28s) |
-| `pytest` | — | 93 testes (unit + integração) |
+| `pytest` | — | 95 testes (unit + integração) |
 
 ## 7. 📚 Documentação
 
 | 📄 Documento | Conteúdo |
 |---|---|
+| [**ACESSOS.md**](ACESSOS.md) | 🔗 **Todos os links, portas e endpoints** — o mapa de acesso do projeto |
 | [**COMECE-AQUI.md**](COMECE-AQUI.md) | 🚀 **Do zero até as 4 telas no ar** — instalação, pipeline, portas e troubleshooting |
 | [docs/mlflow-guia.md](docs/mlflow-guia.md) | 📈 6 formas de acessar o MLflow + troubleshooting |
 | [docs/architecture-azure.md](docs/architecture-azure.md) | ☁️ Arquitetura-alvo Azure (Mermaid, serviços, FinOps) |
@@ -369,7 +370,7 @@ certo em vez da mais fácil de vender. É a justificativa empírica de ranquear 
 **margem × conversão**. Análise completa e os demais gráficos em
 [`docs/mlflow-guia.md`](docs/mlflow-guia.md#22-análise-dos-experimentos--o-que-os-runs-mostram).
 
-- ✅ **93 testes** passando · **ruff** limpo · pipeline ponta-a-ponta em **1 comando**.
+- ✅ **95 testes** passando · **ruff** limpo · pipeline ponta-a-ponta em **1 comando**.
 - 🔍 **Golden set** avalia 24 cenários com **83,3% de aprovação** — **100% em
   segmento (6/6) e adversariais (5/5)**; típicos (5/8) e borda (4/5) ficam
   **abaixo do gate de 0,95**, limitação assumida e documentada, não mascarada.
