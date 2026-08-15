@@ -30,7 +30,7 @@
 | Golden set pass-rate | **83,3%** (adversarial 5/5) | — |
 | Estabilidade (CV reward, 5 seeds) | **2,97%** | 20,2% |
 | Fairness — disparidade de exposição (grupos protegidos) | **0,00** | — |
-| Fairness — disparidade de valor (margem média, grupos protegidos) | **0,24** (pior: ≤30 anos) | — |
+| Fairness — disparidade de valor (margem média, grupos protegidos) | **0,32** (pior: escolaridade) | — |
 
 > Numa seed isolada o Thompson capturou um pouco mais de valor (+9,2%); **na média
 > de 5 seeds o LinUCB lidera e é o mais estável** — por isso é a política recomendada.
@@ -53,16 +53,31 @@ A análise cobre os **atributos protegidos** registrados em
 ver `docs/lgpd-plan.md`), em duas dimensões:
 
 - **Disparidade de exposição** (taxa de *receber alguma oferta*) entre grupos
-  protegidos: **0,00** — nenhum grupo é negado contato/valor.
-- **Disparidade de valor** (margem média da oferta recebida): pior caso **0,24**
-  na faixa **≤30 anos** (margem média R$216 vs R$282 na faixa 46–60). É um
-  **resultado de *suitability*, não discriminação**: clientes jovens são
-  direcionados ao Cartão Cashback (margem R$120) em vez de crédito/depósito de
-  alto valor. Estado civil (0,09) e escolaridade (0,14) ficam abaixo do limiar.
+  protegidos: **0,00** em todos os atributos — **nenhum grupo é negado contato**.
+- **Disparidade de valor** (margem média da oferta recebida), por atributo:
+
+  | Atributo protegido | Disparidade de valor | Grupo pior colocado |
+  |---|---:|---|
+  | **Escolaridade** | **0,3215** ⚠️ | `illiterate` — margem média R$ 180 vs. R$ 253–265 |
+  | Estado civil | 0,2337 | `unknown` — R$ 198 vs. R$ 253–258 |
+  | Faixa etária | 0,1076 | `≤30` — R$ 240 vs. R$ 269 (31–45) |
+
 - **Flag automática**: `review` se a disparidade de exposição passar de 0,25 **ou**
-  a de valor passar de 0,30; hoje **`ok`**. O grupo protegido de cada cliente é
-  registrado no log de decisão **apenas para auditoria** (`protected_groups`),
-  **nunca** como variável de decisão.
+  a de valor passar de 0,30. Hoje o relatório sai como **`review`**, disparado
+  pela escolaridade (0,3215 > 0,30).
+
+> ⚠️ **Interpretação honesta do flag `review`.** Os dois piores grupos são
+> **amostras minúsculas**: `illiterate` tem **1 cliente** nas 6.000 linhas
+> avaliadas (18 em 41.188 na base inteira) e `unknown` de estado civil tem 10. A
+> disparidade é, portanto, **artefato de amostra pequena**, não exclusão
+> sistemática — reforçado pelo fato de a **exposição ser 0,00** (todos recebem
+> oferta). Ainda assim **não silenciamos o flag**: ele fica `review` de propósito,
+> e o *approval gate* (`docs/mlops-lifecycle.md`) exige que uma pessoa avalie o
+> caso antes de promover. A ação recomendada é **agregar** grupos com n < 30 na
+> apuração de fairness, e não afrouxar o limiar.
+
+O grupo protegido de cada cliente é registrado no log de decisão **apenas para
+auditoria** (`protected_groups`), **nunca** como variável de decisão.
 
 > Condição de não-uso documentada: se a disparidade de valor crescer com novas
 > ofertas/segmentos, a política deve ser revisada antes de promover (gate de

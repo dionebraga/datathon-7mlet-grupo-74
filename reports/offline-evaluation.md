@@ -96,27 +96,66 @@ estiverem corretos, com **menor variância que o IPS** e **IC95 por bootstrap**.
 adaptive-offers ope --policy linucb --incumbent baseline   # DR-OPE + IC + gate
 ```
 
-## 6. Fairness de exposição entre segmentos
+### 5.1 Evidência visual — conversão não é o mesmo que valor
 
-Auditamos a **taxa de receber oferta** (qualquer oferta ≠ controle) por segmento
-sintético (faixa etária, sucesso prévio, canal):
+![Valor acumulado × taxa de conversão](../docs/img/mlflow/mlflow-valor-vs-conversao.png)
 
-| Dimensão | Disparidade (max−min) | Flag |
-|---|---:|:--:|
-| age_band | 0,00 | ok |
-| prior_success | 0,00 | ok |
-| channel | 0,00 | ok |
-| **máx. geral** | **0,00** | **ok** |
+No recorte **seed=42** (runs do `train-all` rastreados no MLflow), o **Baseline
+tem a maior conversão de todas (10,63%) e o menor valor (R$ 76.560)**, enquanto o
+LinUCB converte 8,60% e entrega **+41% de valor**. É a justificativa empírica para
+ranquear por **margem × conversão** em vez de conversão pura.
 
-- **Sem negação de oferta** a nenhum segmento (paridade demográfica de exposição
-  = perfeita). O `offer_mix` **varia** por segmento — isso é **personalização
-  intencional** (a oferta certa para o contexto certo), não negação de valor.
+![Comparação de políticas](../docs/img/mlflow/mlflow-metricas.png)
+
+A leitura de exploração é igualmente instrutiva: o Baseline explora **0%** e tem o
+**maior regret (36,7%)**; o LinThompson explora **65,3%** e fica em último em valor.
+O LinUCB fica no meio (≈21%) e obtém o **menor regret (9,7%)** — exploração é um
+custo que precisa ser dosado, não maximizado.
+
+![Sensibilidade à seed](../docs/img/mlflow/mlflow-sensibilidade-seed.png)
+
+Trocando **apenas a seed**, o Baseline varia **+37%** (76.560 → 104.700). É a razão
+de a conclusão usar **5 seeds** em vez de uma. Gráficos gerados por
+`scripts/build_mlflow_charts.py` a partir do `mlruns/`.
+
+> ⚠️ Estes três gráficos são do recorte **seed=42**; a matriz da §3 e o slide 09
+> usam **seed=123**. Recortes distintos, ambos reprodutíveis — nunca os misture
+> numa mesma tabela.
+
+## 6. Fairness — exposição e valor (base real, LinUCB, 6.000 linhas)
+
+Auditamos **duas** dimensões por segmento: a **taxa de receber oferta** (exposição)
+e a **margem média da oferta recebida** (valor). Atributos protegidos vêm de
+`adaptive_offers/responsible.py`.
+
+| Dimensão | Protegida? | Disparidade de **exposição** | Disparidade de **valor** |
+|---|:--:|---:|---:|
+| age_band | sim | 0,00 | 0,1076 |
+| marital | sim | 0,00 | 0,2337 |
+| **education** | sim | 0,00 | **0,3215** ⚠️ |
+| prior_success | não | 0,00 | 0,00 |
+| channel | não | 0,00 | 0,00 |
+| **máx. geral** | — | **0,00** | **0,3215** → flag `review` |
+
+- **Sem negação de oferta** a nenhum segmento: a paridade de **exposição é
+  perfeita (0,00)** em todas as dimensões — ninguém deixa de receber oferta.
+- O `offer_mix` **varia** por segmento — isso é **personalização intencional**
+  (a oferta certa para o contexto certo), não negação de valor.
+- ⚠️ **Por que o flag sai `review`**: a escolaridade passa do limiar de 0,30 por
+  causa do grupo `illiterate`, que tem **1 cliente** nas 6.000 linhas avaliadas
+  (18 em 41.188 na base inteira) e recebeu uma oferta de margem R$ 180 contra
+  R$ 253–265 dos demais. Mesma origem em `marital=unknown` (10 clientes). É
+  **artefato de amostra pequena**, não exclusão sistemática — mas **mantemos o
+  flag ligado de propósito**: o *approval gate* exige revisão humana antes de
+  promover. Correção recomendada: **agregar grupos com n < 30** na apuração,
+  em vez de afrouxar o limiar.
 - O mix por segmento é monitorado continuamente (Stage 7) para detectar
   *drift* que vire exclusão sistemática.
 
 ## 7. Limitações e quando NÃO usar a política
 
-- Resultados em *facsimile*; magnitudes mudam na base real.
+- Base factual real, mas **camada de ofertas/recompensas sintética**: as
+  magnitudes comparam políticas, não estimam *lift* financeiro de produção.
 - Recompensa sintética: não estimar *lift* financeiro real a partir daqui.
 - A política **não** deve decidir casos de *suitability* sensível sozinha —
   mantém-se **humano no loop** (ver `docs/system-card.md` e `docs/lgpd-plan.md`).

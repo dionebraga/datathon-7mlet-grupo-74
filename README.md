@@ -11,7 +11,7 @@
 <br/>
 
 [![CI](https://github.com/dionebraga/datathon-7mlet-grupo-74/actions/workflows/ci.yml/badge.svg)](https://github.com/dionebraga/datathon-7mlet-grupo-74/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-57%20passed-brightgreen?style=flat&logo=pytest&logoColor=white)](tests/)
+[![Tests](https://img.shields.io/badge/tests-93%20passed-brightgreen?style=flat&logo=pytest&logoColor=white)](tests/)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-success?style=flat&logo=ruff&logoColor=white)](https://docs.astral.sh/ruff/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat)](LICENSE)
 [![Version](https://img.shields.io/badge/version-0.8.0-blue?style=flat)](pyproject.toml)
@@ -108,12 +108,12 @@ datathon-7mlet-grupo-74/
 │   └── responsible.py             # atributos protegidos + fairness por grupo
 ├── 📊 dashboard/                  # BI (Streamlit)
 ├── 🎨 frontend/                   # Console de decisão (Next.js + Tailwind v4 — bônus, consome a API)
-└── ✅ tests/                      # unit/ + integration/ (81 testes)
+└── ✅ tests/                      # unit/ + integration/ (93 testes)
 ```
 
 ### 📈 Como ler o histórico de commits
 
-O trabalho foi feito em **sprints focados** (não um commit por dia), com **72+
+O trabalho foi feito em **sprints focados** (não um commit por dia), com **100+
 commits** que mostram a **evolução real** — não um único commit final (Etapa 0).
 
 - **Padrão `stage-0` … `stage-8`**: os commits iniciais seguem as etapas do edital
@@ -182,19 +182,58 @@ docker compose up --build
 
 > 🚀 **Subir tudo de uma vez** (API + MLflow + Dashboard, em janelas separadas):
 > `.\start.ps1` · para encerrar: `.\stop.ps1`
+> 👉 Nunca rodou o projeto? Siga o [**COMECE-AQUI.md**](COMECE-AQUI.md) (do zero até as 4 telas no ar).
 
 | O quê | Comando (PowerShell) | Abrir em |
 |---|---|---|
 | 🌐 **API + Swagger** (docs interativa) | `adaptive-offers serve` | http://localhost:8000/docs |
-| 📊 **Dashboard BI** (comparação, regret, decisão) | `streamlit run dashboard\app.py` | http://localhost:8501 |
+| 📊 **Dashboard BI** (comparação, regret, decisão) | `streamlit run dashboard\app.py --server.port 8503` | http://localhost:8503 |
 | 📈 **MLflow** (experimentos) | `$env:MLFLOW_ALLOW_FILE_STORE='true'; mlflow ui --backend-store-uri file:./mlruns --port 5001` | http://localhost:5001 |
+| 🎨 **Decision Console** (Next.js, bônus) | `cd frontend; npm install; npm run dev` | http://localhost:3000 |
 | 🧾 **Log auditável de decisões** | `Get-Content artifacts\decisions\audit.jsonl -Tail 5` | terminal |
 | 📓 **Notebook de EDA** | `jupyter lab notebooks\01_eda.ipynb` | navegador |
 
-> 📈 **No MLflow, use a aba `Model training`** (topo, ao lado de `GenAI`) para ver os
+> ⚠️ As portas **5001** (MLflow) e **8503** (dashboard) não são as padrão: a 5000 e
+> a 8501 colidem com outros serviços comuns no Windows. `start.ps1` já usa as
+> corretas — se abrir a porta errada, você verá uma página em branco ou de outro app.
+
+### 5.1 📈 MLflow — 6 formas de acessar os experimentos
+
+Os **19 runs** (1 por política × seeds) ficam em `mlruns/`, no *file store* local.
+Guia completo com filtros, comparações e troubleshooting:
+[**docs/mlflow-guia.md**](docs/mlflow-guia.md).
+
+```powershell
+# 1) UI web — a forma da demo. Espere ~15–40 s pelo "Uvicorn running".
+$env:MLFLOW_ALLOW_FILE_STORE='true'
+mlflow ui --backend-store-uri file:./mlruns --registry-store-uri file:./mlruns --port 5001
+#  ↳ na UI, clique na aba "Model training" (NÃO em "GenAI") → Runs
+
+# 2) Duplo-clique (sem terminal): VER-MLFLOW.bat, na pasta acima do projeto
+
+# 3) Tabela dos runs no terminal — instantâneo, sem subir servidor nenhum
+python scripts\mlflow_report.py                 # todos os runs, ordenados por reward
+python scripts\mlflow_report.py --compare       # melhor run de CADA política (vai ao pitch)
+python scripts\mlflow_report.py --policy linucb # filtra uma política
+python scripts\mlflow_report.py --top 3         # os 3 melhores
+python scripts\mlflow_report.py --run-id <id>   # todos os params/métricas de um run
+
+# 4) API Python direta (aspas simples por fora: o PowerShell não escapa aspas duplas aninhadas)
+python -c 'import mlflow; mlflow.set_tracking_uri("file:./mlruns"); print(mlflow.search_runs(experiment_names=["adaptive-offers"]).shape[0], "runs")'
+
+# 5) Reproduzir um run e vê-lo aparecer na UI ao vivo (bom momento de gravação)
+adaptive-offers train-all --horizon 6000        # 1 run por política, tudo logado no MLflow
+
+# 6) Docker (stack inteira, MLflow incluso)
+docker compose up --build
+```
+
+> 📈 **Na UI, use a aba `Model training`** (topo, ao lado de `GenAI`) para ver os
 > runs, métricas e a comparação de políticas. A visão `GenAI` (Overview/Traces) é de
-> LLM e exige backend SQL — fica vazia com o *file store*, o que é esperado.
-> A UI leva ~10–15 s para subir; espere aparecer `Uvicorn running` no terminal.
+> LLM e exige backend SQL — fica **vazia** com o *file store*, o que é esperado.
+> A aba **Artifacts** de cada run também fica vazia: registramos **params, métricas
+> e tags** (o modelo serializado vive em `artifacts/policies/`, versionado pelo
+> registry próprio em `artifacts/policies/registry.json`).
 
 **Testar a API com PowerShell** (com o `serve` rodando em outra janela):
 
@@ -248,12 +287,15 @@ ANTHROPIC_MODEL=claude-opus-4-8           # qualidade máxima (ou claude-haiku-4
 | `adaptive-offers serve` | 5 | API com contrato documentado e tratamento de erro |
 | `adaptive-offers monitor` | 7 | Relatório HTML de drift/fairness (EvidentlyAI opcional) |
 | `adaptive-offers pipeline --rows 20000` | 1–4 | **Tudo em um comando** (28s) |
-| `pytest` | — | 89 testes (unit + integração) |
+| `pytest` | — | 93 testes (unit + integração) |
 
 ## 7. 📚 Documentação
 
 | 📄 Documento | Conteúdo |
 |---|---|
+| [**COMECE-AQUI.md**](COMECE-AQUI.md) | 🚀 **Do zero até as 4 telas no ar** — instalação, pipeline, portas e troubleshooting |
+| [docs/roteiro-gravacao.md](docs/roteiro-gravacao.md) | 🎬 Roteiro do pitch (10 min + 5 min Q&A) — pré-voo, minuto a minuto, banco de respostas |
+| [docs/mlflow-guia.md](docs/mlflow-guia.md) | 📈 6 formas de acessar o MLflow + troubleshooting |
 | [docs/architecture-azure.md](docs/architecture-azure.md) | ☁️ Arquitetura-alvo Azure (Mermaid, serviços, FinOps) |
 | [docs/feature-store.md](docs/feature-store.md) | 🗄️ Feature Store offline/online |
 | [docs/mlops-lifecycle.md](docs/mlops-lifecycle.md) | 🔁 Ciclo MLOps (MLflow, drift, promote/rollback) |
@@ -295,16 +337,48 @@ ANTHROPIC_MODEL=claude-opus-4-8           # qualidade máxima (ou claude-haiku-4
 
 ## 9. 🏁 Resultados principais
 
-| Política | Reward acumulado | Regret ratio | Lift vs baseline | Golden set |
-|---|---:|---:|---:|:---:|
-| 🥇 **LinUCB** (contextual) | **393.550** | **4,6%** | **+8,3%** | **95,8%** |
-| 🥈 Thompson Sampling | 363.570 | 10,3% | +0,1% | — |
-| 🥉 Nilos-UCB (UCB-V) | 358.810 | 12,3% | −1,2% | — |
-| Baseline (controle) | 363.240 | 9,9% | — | — |
+Base **real** (UCI Bank Marketing, 41.188 contatos · `provenance="real"`), 6.000
+rounds, 40% de recompensa atrasada, `seed=123`:
 
-- ✅ **57 testes** passando · **ruff** limpo · pipeline ponta-a-ponta em **1 comando**.
-- 🔍 **Golden set** avalia 24 cenários (typical, segment, edge, adversarial) com **95,8% de aprovação** — LinUCB é o melhor estimador em todos os estratos.
-- ⚖️ **Fairness** de exposição: disparidade **0,00** entre segmentos.
+| Política | Reward acumulado | Regret ratio | Conversão | Exploração | Lift vs baseline |
+|---|---:|---:|---:|---:|---:|
+| 🥇 Thompson Sampling | **114.290** | 11,8% | 7,1% | 11,7% | **+9,2%** |
+| 🥈 **LinUCB** (contextual) | 113.230 | **8,3%** | **9,1%** | 26,4% | +8,2% |
+| 🥉 Baseline (controle) | 104.700 | 10,9% | 6,2% | 0,0% | — |
+| Nilos-UCB (UCB-V) | 102.020 | 17,0% | 7,1% | 29,1% | **−2,6%** |
+
+> 🎯 **Leitura honesta.** Em **uma** seed o Thompson lidera por pouco, mas em
+> **5 seeds** o **LinUCB é a política recomendada**: maior reward médio
+> (**110.046** vs. 105.512 do Thompson), vence 3/5 e é a **mais estável**
+> (CV **2,97%** contra 20,2% do baseline). O ganho na base real é **modesto
+> (single digits)** — não os ~+60% que o fac-símile produzia.
+
+**Validação independente — off-policy (Doubly Robust)**, só com eventos já
+logados, confirma o ranking: LinUCB **19,18** (IC95 `[17,66 · 20,65]`) >
+Thompson 16,91 > Baseline 16,44 > Nilos-UCB 10,47. O **gate de promoção
+A/B-free** (`adaptive-offers ope`) aprova o LinUCB porque o **limite inferior**
+do seu IC (17,66) supera o valor da incumbente (16,44).
+
+### Converter mais não é faturar mais
+
+![Valor acumulado × taxa de conversão](docs/img/mlflow/mlflow-valor-vs-conversao.png)
+
+Nos runs rastreados no MLflow (recorte `seed=42`), o **Baseline tem a maior
+conversão de todas — 10,63% — e o menor valor acumulado**. O LinUCB converte
+*menos* (8,60%) e entrega **+41% de valor**: escolhe a oferta certa para o perfil
+certo em vez da mais fácil de vender. É a justificativa empírica de ranquear por
+**margem × conversão**. Análise completa e os demais gráficos em
+[`docs/mlflow-guia.md`](docs/mlflow-guia.md#22-análise-dos-experimentos--o-que-os-runs-mostram).
+
+- ✅ **93 testes** passando · **ruff** limpo · pipeline ponta-a-ponta em **1 comando**.
+- 🔍 **Golden set** avalia 24 cenários com **83,3% de aprovação** — **100% em
+  segmento (6/6) e adversariais (5/5)**; típicos (5/8) e borda (4/5) ficam
+  **abaixo do gate de 0,95**, limitação assumida e documentada, não mascarada.
+- ⚖️ **Fairness**: disparidade de **exposição 0,00** em todos os grupos
+  protegidos (ninguém deixa de receber oferta). A disparidade **de valor**
+  dispara o flag `review` (0,32 em escolaridade) — causada por um grupo de
+  **1 cliente** (`illiterate`); mantemos o flag ligado de propósito, com revisão
+  humana no gate. Análise completa em [`docs/model-card.md`](docs/model-card.md).
 
 ---
 
