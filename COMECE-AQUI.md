@@ -209,7 +209,7 @@ adaptive-offers decide --context examples\context_sample.json
 | 📈 | **MLflow** | veja o [guia dedicado](docs/mlflow-guia.md) | http://localhost:5001 |
 | 🎨 | **Decision Console** | `cd frontend; npm install; npm run dev` | http://localhost:3000 |
 
-Ou tudo junto com **`.\start.ps1`** (abre uma janela por serviço).
+Ou tudo junto com **`.\start.ps1`** — sobe as **quatro** (o Console é pulado com aviso se o Node ou o `node_modules` faltarem).
 
 > ⚠️ **As portas não são as padrão.** MLflow usa **5001** (a 5000 colide com
 > outros serviços no Windows) e o dashboard usa **8503** (não 8501). Todos os

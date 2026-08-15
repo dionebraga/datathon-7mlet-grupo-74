@@ -20,8 +20,8 @@ cd C:\Users\Dione\Desktop\datathon-7mlet-grupo-74\datathon-7mlet-grupo-64
 
 Aguarde **até 40 segundos**. Para encerrar: `.\stop.ps1`
 
-> O `start.ps1` abre **uma janela do PowerShell por serviço** — é assim que você
-> vê que subiu e mantém o controle. Se seu terminal não mostra nada, os
+> O `start.ps1` abre **uma janela do PowerShell por serviço** — as quatro,
+> Decision Console incluso — e é assim que você vê que subiu e mantém o controle. Se seu terminal não mostra nada, os
 > processos não são seus: veja [Por que não aparece nada no meu terminal?](#-por-que-não-aparece-nada-no-meu-terminal)
 
 ---
