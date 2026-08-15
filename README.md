@@ -74,7 +74,7 @@ políticas comerciais internas (sintéticas) e explica cada decisão.
 |---|---|---|
 | 🧠 Formulação | Multi-armed bandit contextual | Equilibra exploração/explotação sem A/B longos |
 | 🎰 Algoritmos | Baseline · Thompson · Nilos-UCB · LinUCB · **Neural (PyTorch)** | Não-contextual (TS/UCB), contextual linear (LinUCB) e **deep bandit** (MC-dropout) |
-| 📊 Base factual | [Bank Marketing (Kaggle)](data/kaggle/README.md) | Propensão/conversão bancária, licença aberta |
+| 📊 Base factual | **[Bank Marketing — Kaggle](https://www.kaggle.com/datasets/henriqueyamahata/bank-marketing)** (`henriqueyamahata` · UCI, Moro et al. 2014 · 41.188 linhas · CC BY 4.0) — detalhes em [`data/kaggle/README.md`](data/kaggle/README.md) | Propensão/conversão bancária, licença aberta |
 | 🚫 Vazamento | `duration` e colunas pós-contato **descartadas** | Evitar *target leakage* (Stage 1) |
 | ⏳ Recompensa atrasada | Modelada no enriquecimento sintético | Realismo de canais digitais |
 | 🗄️ Feature Store | Offline (Parquet) + Online (SQLite) versionado | Consistência treino/serving, baixa latência |
