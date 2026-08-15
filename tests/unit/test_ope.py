@@ -7,7 +7,6 @@ import pandas as pd
 import pytest
 
 from adaptive_offers.evaluation.ope import (
-    RewardModel,
     _bootstrap_ci,
     doubly_robust,
     fit_reward_model,

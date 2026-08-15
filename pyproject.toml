@@ -80,6 +80,10 @@ ignore = ["E501", "B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["B017"]  # tests intentionally assert on broad validation errors
+# C408: Plotly/Streamlit config is written as dict(a=1, b=2) by convention — the
+# nested-kwargs style is what their docs use and it reads better than literals.
+"dashboard/*" = ["C408"]
+"scripts/*" = ["C408"]
 
 [tool.mypy]
 python_version = "3.11"

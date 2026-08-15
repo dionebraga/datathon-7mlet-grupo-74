@@ -1023,10 +1023,8 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
         )
 
     # ── AUDIT endpoints ────────────────────────────────────────────────────
-    _AUDIT_PATH = (
-        lambda: __import__("pathlib").Path(__file__).resolve().parents[3]
-        / "artifacts" / "decisions" / "audit.jsonl"
-    )
+    def _AUDIT_PATH() -> Path:
+        return Path(__file__).resolve().parents[3] / "artifacts" / "decisions" / "audit.jsonl"
 
     @app.get(
         "/audit",
@@ -1166,8 +1164,8 @@ footer{text-align:center;color:#8899BB;font-size:11px;padding-top:24px;border-to
 
         Escreve `artifacts/.active_policy` com o nome/versão selecionados.
         """
-        import json
         from adaptive_offers.policy.versioning import set_active_version
+
         try:
             set_active_version(body.policy, body.version)
         except Exception as exc:

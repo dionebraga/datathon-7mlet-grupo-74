@@ -47,7 +47,7 @@ def age_band(age: Any) -> str:
         a = float(age)
     except (TypeError, ValueError):
         return "unknown"
-    for hi, label in zip(_AGE_BINS[1:], _AGE_LABELS):
+    for hi, label in zip(_AGE_BINS[1:], _AGE_LABELS, strict=False):
         if a <= hi:
             return label
     return _AGE_LABELS[-1]
