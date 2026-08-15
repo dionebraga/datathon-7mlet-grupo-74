@@ -5,7 +5,8 @@ big KPI tiles with sparklines, gauges, experiment panels, a live decision feed
 (from the audit log) and an interactive decision explorer with reason codes and
 an LLM/RAG explanation.
 
-Run (PowerShell):  streamlit run dashboard\app.py   ->  http://localhost:8501
+Run (PowerShell):  streamlit run dashboard\app.py --server.port 8503
+                   ->  http://localhost:8503   (porta usada por start.ps1)
 """
 
 from __future__ import annotations

@@ -1,8 +1,8 @@
 # =============================================================================
 # start.ps1 — sobe a stack completa do Adaptive Offers em janelas separadas:
 #   - API REST + Swagger  -> http://localhost:8000/docs
-#   - MLflow (experimentos)-> http://localhost:5000
-#   - Dashboard BI         -> http://localhost:8501
+#   - MLflow (experimentos)-> http://localhost:5001
+#   - Dashboard BI         -> http://localhost:8503
 #
 # Uso (PowerShell, na pasta do projeto):
 #   .\start.ps1
