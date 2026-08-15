@@ -168,15 +168,29 @@ class Assistant:
                     + (" ← escolhido" if k == decision.get("arm_id") else "")
                     for i, (k, v) in enumerate(ranked)
                 )
-            estimates = decision.get("estimates") or {}
-            p_chosen = estimates.get(decision.get("arm_id"))
-            p_line = f"\nP(conversão | contexto) do braço escolhido: {p_chosen:.1%}" if p_chosen else ""
+            # P(conversão) vem do registro da decisão. NÃO derive de `estimates`:
+            # aquilo é o score ridge do LinUCB (pode ser negativo) — lê-lo como
+            # probabilidade produz números falsos num prompt que se diz grounded.
+            p_chosen = decision.get("expected_p")
+            margin_chosen = decision.get("margin")
+            p_line = (
+                f"\nP(conversão | contexto) do braço escolhido: {float(p_chosen):.1%}"
+                if p_chosen is not None else ""
+            )
+            if p_chosen is not None and margin_chosen:
+                p_line += (
+                    f"\nMargem do braço escolhido: R$ {float(margin_chosen):.0f}"
+                    f"  → valor esperado = {float(p_chosen):.1%} × R$ "
+                    f"{float(margin_chosen):.0f}"
+                )
             orch = _orchestration_grounding(decision)
+            # Vírgula decimal: "R$ 63.508" seria lido como sessenta e três mil em pt-BR.
+            reward_br = f"{float(decision.get('expected_reward') or 0):.2f}".replace(".", ",")
             grounding = (
                 f"Oferta recomendada: **{arm_name}**\n"
                 f"Política: `{decision.get('policy_name')}@{decision.get('policy_version')}` "
                 f"(modo: {mode})\n"
-                f"Valor esperado (P × margem): R$ {decision.get('expected_reward')}"
+                f"Valor esperado (P × margem): R$ {reward_br} por impressão"
                 f"{p_line}\n"
                 f"Ranking dos braços elegíveis por score ponderado por margem:\n{ranking}\n"
                 f"Reason codes: {reason_h}\n"
@@ -298,8 +312,8 @@ class Assistant:
         policy   = decision.get("policy_name", "?")
         version  = decision.get("policy_version", "v1")
         reward   = float(decision.get("expected_reward", 0))
-        expec_p  = decision.get("expected_p", None)
-        margin   = decision.get("margin", None)
+        expec_p  = decision.get("expected_p")
+        margin   = decision.get("margin")
 
         # Mode with concrete explanation tied to algorithm mechanics
         if explored:
@@ -307,8 +321,8 @@ class Assistant:
             mode_detail = (
                 "O bandit selecionou este braço para reduzir incerteza sobre seu "
                 "potencial — a estimativa de P(conversão) ainda tem variância alta. "
-                f"A penalidade UCB (termo α·√(xᵀA⁻¹x)) ou a amostragem da posterior "
-                f"de Thompson superou o valor estimado dos braços consagrados. "
+                "A penalidade UCB (termo α·√(xᵀA⁻¹x)) ou a amostragem da posterior "
+                "de Thompson superou o valor estimado dos braços consagrados. "
                 "Sem essa exploração periódica, o modelo nunca descobriria ofertas "
                 "potencialmente melhores para este perfil."
             )

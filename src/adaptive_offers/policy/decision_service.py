@@ -21,6 +21,7 @@ from adaptive_offers.data.synthetic import (
     build_context_vector,
     eligible_arms,
     expected_reward,
+    latent_conversion_prob,
     offer_catalog,
 )
 from adaptive_offers.feature_store.store import FeatureStore
@@ -47,6 +48,12 @@ class DecisionRecord:
     arm_name: str
     score: float
     expected_reward: float
+    # The two factors behind `expected_reward = expected_p * margin`. Recorded
+    # explicitly so downstream consumers (assistant, audit) never have to infer
+    # a probability — the policy's raw `estimates` are ridge scores that can be
+    # negative, and reading them as probabilities produces nonsense figures.
+    expected_p: float
+    margin: float
     explored: bool
     policy_name: str
     policy_version: str
@@ -118,6 +125,7 @@ class DecisionService:
             codes.append("CONTROL_FALLBACK")
 
         arm = self.by_id[decision.arm_id]
+        exp_p = latent_conversion_prob(arm, ctx_vec)
         exp_rew = expected_reward(arm, ctx_vec)
         seg = segment_of(features)
 
@@ -148,6 +156,8 @@ class DecisionService:
             arm_name=arm.name,
             score=round(float(decision.score), 4),
             expected_reward=round(float(exp_rew), 3),
+            expected_p=round(float(exp_p), 4),
+            margin=round(float(arm.margin), 2),
             explored=bool(decision.explored),
             policy_name=self.policy.name,
             policy_version=self.metadata.version,

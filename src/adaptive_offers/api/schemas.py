@@ -140,6 +140,18 @@ class DecisionOut(BaseModel):
         description="Valor esperado: P(conversão) × margem.",
         examples=[25.5],
     )
+    expected_p: float = Field(
+        description=(
+            "P(conversão) estimada para o braço escolhido. É o fator probabilístico "
+            "de `expected_reward`; não confundir com `estimates`, que são os scores "
+            "lineares da política (podem ser negativos)."
+        ),
+        examples=[0.353],
+    )
+    margin: float = Field(
+        description="Margem (R$) da oferta escolhida — o outro fator de `expected_reward`.",
+        examples=[180.0],
+    )
     explored: bool = Field(
         description="True se foi uma decisão exploratória (vs. explotação)."
     )
@@ -156,8 +168,12 @@ class DecisionOut(BaseModel):
         description="Reason codes com descrições completas."
     )
     estimates: dict[str, float] = Field(
-        description="Mapa braço → estimativa de P(conversão) para todos os braços elegíveis.",
-        examples=[{"OFF_LOAN_PREAPP": 0.085, "OFF_TD_PREMIUM": 0.043}],
+        description=(
+            "Mapa braço → estimativa interna da política (para o LinUCB, o score "
+            "ridge xᵀθ̂). **Não é probabilidade** — pode ser negativo. Para "
+            "P(conversão) do braço escolhido use `expected_p`."
+        ),
+        examples=[{"OFF_LOAN_PREAPP": -0.1435, "OFF_FUND_INTRO": 0.2637}],
     )
     scores: dict[str, float] = Field(
         default_factory=dict,
