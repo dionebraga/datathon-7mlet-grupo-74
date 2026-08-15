@@ -61,9 +61,12 @@ export function DecisionHistory() {
             </span>
           </div>
           <ul className="max-h-72 space-y-1.5 overflow-y-auto pr-1">
-            {entries.map((e) => (
+            {/* O log é append-only e histórico: registros gravados antes da
+                correção do gerador de IDs compartilham `decision_id`. A posição
+                desambigua sem esconder o dado antigo. */}
+            {entries.map((e, i) => (
               <li
-                key={e.decision_id}
+                key={`${e.decision_id}#${i}`}
                 className="flex items-center justify-between gap-2 rounded-lg border border-border bg-white/[0.03] px-3 py-2 text-xs"
               >
                 <div className="flex min-w-0 items-center gap-2">

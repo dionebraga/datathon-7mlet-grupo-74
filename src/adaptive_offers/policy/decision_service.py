@@ -9,9 +9,11 @@ version and the eligible set. Every decision is appended to an audit log.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from adaptive_offers.bandits.base import Policy
 from adaptive_offers.channels import DEFAULT_CONTACT_POLICY
@@ -95,6 +97,11 @@ class DecisionService:
         self.audit_path = audit_path or (settings.paths.artifacts / "decisions" / "audit.jsonl")
         self.audit_path.parent.mkdir(parents=True, exist_ok=True)
         self._counter = 0
+        # Sufixo por instância: o contador sozinho reinicia do zero a cada
+        # processo, então API e CLI — que rodam ao mesmo tempo nesta demo —
+        # emitiam `dec_00000001` cada uma. Num log que se propõe auditável,
+        # ID repetido é o mesmo que não ter ID.
+        self._run_id = uuid4().hex[:6]
 
     @classmethod
     def from_active(cls, version: str | None = None) -> DecisionService:
@@ -148,9 +155,13 @@ class DecisionService:
             codes.append("NBA_GENERATED")
 
         self._counter += 1
+        ts = utc_now_iso()
+        # dec_<AAAAMMDDThhmmss>_<run>_<seq>: ordenável por tempo, único entre
+        # processos e reinícios, e ainda legível a olho no log.
+        stamp = re.sub(r"[-:]", "", ts[:19])
         record = DecisionRecord(
-            decision_id=f"dec_{self._counter:08d}",
-            ts=utc_now_iso(),
+            decision_id=f"dec_{stamp}_{self._run_id}_{self._counter:05d}",
+            ts=ts,
             client_event_id=cid,
             arm_id=arm.offer_id,
             arm_name=arm.name,

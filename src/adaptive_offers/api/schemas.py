@@ -128,7 +128,13 @@ class ReasonOut(BaseModel):
 class DecisionOut(BaseModel):
     """🎯 Registro auditável de uma decisão do bandit contextual."""
 
-    decision_id: str = Field(description="Identificador único da decisão.", examples=["dec_00000001"])
+    decision_id: str = Field(
+        description=(
+            "Identificador único da decisão: `dec_<AAAAMMDDThhmmss>_<run>_<seq>`. "
+            "Ordenável por tempo e único entre processos e reinícios do serviço."
+        ),
+        examples=["dec_20260815T214601_dac41c_00001"],
+    )
     ts: str = Field(description="Timestamp ISO 8601 da decisão.", examples=["2026-06-18T10:30:00Z"])
     client_event_id: str | None = Field(
         description="ID do evento de cliente (se resolvido via feature store)."
