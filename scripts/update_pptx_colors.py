@@ -2,6 +2,12 @@
 Atualiza o PPTX da Adaptive Offers Platform com a nova paleta de cores
 e adiciona slides para MLflow e API Docs.
 
+⚠️ ATENÇÃO — SCRIPT HISTÓRICO, NÃO RODE SEM LER.
+A tabela de resultados embutida aqui (R$ 424.820, +66,6%, regret 5,1%) é da era
+do fac-símile determinístico e está ERRADA para a base real. Se rodar este
+script, rode `python scripts/sync_pptx_numbers.py` em seguida para restaurar os
+números corretos (fonte de verdade: `artifacts/evaluation_report.json`).
+
 Nova paleta:
   BG/fundo    #000000  preto
   PANEL       #030D24  navy escuro

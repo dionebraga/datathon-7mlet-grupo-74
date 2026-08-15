@@ -2,6 +2,15 @@
 Remove slides 20-21 (ruim) e recria slides limpos para MLflow e API.
 Versão 2: limpa placeholders herdados do layout e adiciona retângulo
 de fundo escuro explícito como primeira shape.
+
+⚠️ ATENÇÃO — SCRIPT HISTÓRICO, NÃO RODE SEM LER.
+Os números embutidos aqui (R$ 424.820, lift +66,6%, regret 5,1%, "7 endpoints")
+são da época em que o pipeline rodava sobre o fac-símile determinístico. Com a
+base real do Kaggle eles ficaram ERRADOS — os valores corretos estão em
+`artifacts/evaluation_report.json` e em `reports/technical-report.md`.
+
+Se você rodar este script, ele REINTRODUZ os números antigos no deck. Rode
+`python scripts/sync_pptx_numbers.py` logo em seguida para corrigi-los.
 """
 from __future__ import annotations
 import sys
