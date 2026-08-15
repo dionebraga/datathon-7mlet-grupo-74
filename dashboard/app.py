@@ -48,6 +48,12 @@ def fill() -> dict:
 NO_BAR = {"displayModeBar": False, "scrollZoom": False}
 
 
+# Porta do MLflow num só lugar. O badge de status checava 5000 (a padrão do
+# MLflow) enquanto start.ps1 e os .bat sobem na 5001 — então o serviço aparecia
+# offline mesmo rodando. Uma constante evita as duas metades divergirem de novo.
+MLFLOW_PORT = 5001
+
+
 def port_open(port: int, host: str = "127.0.0.1") -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.settimeout(0.2)
@@ -1423,7 +1429,7 @@ with st.sidebar:
 
     # ── Serviços ─────────────────────────────────────────────────────────────
     st.markdown('<div class="side-sect">🔌 Serviços</div>', unsafe_allow_html=True)
-    api_up, mlf_up = port_open(8000), port_open(5000)
+    api_up, mlf_up = port_open(8000), port_open(MLFLOW_PORT)
 
     def badge(up):  # noqa: ANN001
         return '<span class="stat on">● online</span>' if up else '<span class="stat off">● offline</span>'
@@ -1432,7 +1438,7 @@ with st.sidebar:
         f'<div class="side-svc"><div><span class="svc-name">API REST</span>'
         f'<span class="svc-cmd">adaptive-offers serve</span></div>{badge(api_up)}</div>'
         f'<div class="side-svc"><div><span class="svc-name">MLflow</span>'
-        f'<span class="svc-cmd">mlflow ui --port 5000</span></div>{badge(mlf_up)}</div>',
+        f'<span class="svc-cmd">mlflow ui --port {MLFLOW_PORT}</span></div>{badge(mlf_up)}</div>',
         unsafe_allow_html=True,
     )
     st.divider()
@@ -1527,7 +1533,7 @@ with st.sidebar:
 # --------------------------------------------------------------------------- #
 # Topbar
 # --------------------------------------------------------------------------- #
-api_up, mlf_up = port_open(8000), port_open(5000)
+api_up, mlf_up = port_open(8000), port_open(MLFLOW_PORT)
 _active_pol = POLICY_LABEL.get(best["policy"], best["policy"])
 st.markdown(
     '<div class="topbar">'
