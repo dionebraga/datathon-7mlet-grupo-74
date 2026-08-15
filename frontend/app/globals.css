@@ -26,6 +26,13 @@
   html,
   body {
     min-height: 100%;
+    /* Sem isto, qualquer elemento que passe da largura da viewport cria rolagem
+       horizontal — e como o caracol é um Canvas `position: fixed`, ele NÃO
+       acompanha essa rolagem: o conteúdo desliza para o lado e o fundo fica
+       parado, desalinhando os dois. Travar o eixo X mantém conteúdo e fundo
+       sempre no mesmo lugar. */
+    overflow-x: hidden;
+    max-width: 100vw;
     /* Hero background image (/hero-bg.png), fixed on pure black. A translucent
        overlay fades it so content stays readable over the glowing curve.
        `fixed` is desktop-only: iOS Safari renders a fixed-attachment background
