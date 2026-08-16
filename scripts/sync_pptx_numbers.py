@@ -41,7 +41,7 @@ EDITS: list[tuple[int, int, str, str]] = [
     (9, 20, "mlflow ui · :5000", "mlflow ui · :5001"),
 
     # --- S13 · contagem de testes --------------------------------------------
-    (12, 26, "61 testes (unit + integração)", "93 testes (unit + integração)"),
+    (12, 26, "93 testes (unit + integração)", "95 testes (unit + integração)"),
 
     # --- S20 · o que o MLflow realmente registra ------------------------------
     (19, 12, "  artefatos: modelo + features", "  tags: policy, stage, seed"),

@@ -110,11 +110,22 @@ def build_report(
     rewards = rng.normal(11.0, 8.0, 600).clip(0, None)
     health = reward_health(rewards, reference_mean=11.0, reference_std=8.0)
 
-    # Top-3 drifted features get a distribution overlay chart.
+    # Top-3 drifted features get a distribution overlay chart — quando o plotly
+    # está disponível. Ele mora no extra [bi], então uma instalação base (a do
+    # CI, por exemplo) não o tem: o relatório sai sem os gráficos em vez de
+    # falhar, mesma degradação que já aplicamos ao EvidentlyAI. Os números de
+    # PSI/KS, que são o conteúdo que importa, vêm da tabela e não do gráfico.
     top = sorted(report["features"].items(), key=lambda kv: kv[1]["psi"], reverse=True)[:3]
     charts = []
     for i, (feat, _) in enumerate(top):
-        fig = _dist_fig(reference[feat], current[feat], feat)
+        try:
+            fig = _dist_fig(reference[feat], current[feat], feat)
+        except ModuleNotFoundError:
+            charts = [
+                "<p><i>Gráficos de distribuição omitidos: plotly não instalado.</i> "
+                'Para incluí-los: <code>pip install "adaptive-offers[bi]"</code>.</p>'
+            ]
+            break
         charts.append(fig.to_html(full_html=False, include_plotlyjs="cdn" if i == 0 else False))
 
     fairness_html = ""

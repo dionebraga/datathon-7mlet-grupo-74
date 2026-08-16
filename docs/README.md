@@ -42,7 +42,7 @@
 
 | Documento | Descrição |
 |---|---|
-| [🎯 Adaptive-Offers-Pitch-Grupo74.pdf](Adaptive-Offers-Pitch-Grupo74.pdf) | Slides do pitch (10 min + 5 min Q&A) — problema, abordagem, demonstração, evidências, riscos, governança, impacto e FinOps. |
+| [🎯 Adaptive-Offers-Pitch-Grupo74.pdf](Adaptive-Offers-Pitch-Grupo74.pdf) | Slides do pitch — problema, abordagem, demonstração, evidências, riscos, governança, impacto e FinOps. |
 
 ---
 

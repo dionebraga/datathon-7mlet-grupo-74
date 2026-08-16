@@ -336,16 +336,35 @@ class ErrorOut(BaseModel):
 class AuditEntryOut(BaseModel):
     """🔎 Entrada do log auditável de decisões."""
 
-    decision_id: str = Field(description="ID único da decisão.", examples=["dec_00000001"])
-    ts: str = Field(description="Timestamp ISO 8601.", examples=["2026-06-20T10:30:00Z"])
-    arm_id: str = Field(description="ID da oferta escolhida.", examples=["OFF_DEPOSIT"])
-    arm_name: str | None = Field(default=None, description="Nome da oferta.")
-    score: float | None = Field(default=None, description="Score bruto do bandit.")
-    expected_reward: float | None = Field(default=None, description="Valor esperado (R$).")
-    explored: bool | None = Field(default=None, description="Decisão exploratória?")
-    policy_name: str | None = Field(default=None, description="Política usada.")
-    policy_version: str | None = Field(default=None, description="Versão da política.")
-    reason_codes: list[str] = Field(default_factory=list, description="Reason codes.")
+    # Exemplos precisam ser valores que o sistema realmente emite: o Swagger é a
+    # primeira coisa que alguém lê, e um `OFF_DEPOSIT` (braço inexistente) ou um
+    # `dec_00000001` (formato de ID aposentado) ensina errado.
+    decision_id: str = Field(
+        description="ID único da decisão.", examples=["dec_20260815T214601_dac41c_00001"]
+    )
+    ts: str = Field(description="Timestamp ISO 8601.", examples=["2026-08-15T21:46:01Z"])
+    arm_id: str = Field(description="ID da oferta escolhida.", examples=["OFF_FUND_INTRO"])
+    arm_name: str | None = Field(
+        default=None, description="Nome da oferta.", examples=["Fundo de Investimento Intro"]
+    )
+    score: float | None = Field(
+        default=None, description="Score bruto do bandit.", examples=[117.8161]
+    )
+    expected_reward: float | None = Field(
+        default=None, description="Valor esperado (R$).", examples=[63.508]
+    )
+    explored: bool | None = Field(
+        default=None, description="Decisão exploratória?", examples=[False]
+    )
+    policy_name: str | None = Field(default=None, description="Política usada.", examples=["linucb"])
+    policy_version: str | None = Field(
+        default=None, description="Versão da política.", examples=["v1"]
+    )
+    reason_codes: list[str] = Field(
+        default_factory=list,
+        description="Reason codes.",
+        examples=[["LINUCB", "CONTEXTUAL", "EXPLOITATION", "MARGIN_WEIGHTED", "SUITABILITY_OK"]],
+    )
 
 
 class AuditSummaryOut(BaseModel):
