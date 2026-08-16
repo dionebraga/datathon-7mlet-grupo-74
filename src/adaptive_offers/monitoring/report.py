@@ -20,7 +20,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
 
 from adaptive_offers.config import get_settings
 from adaptive_offers.logging_utils import get_logger
@@ -49,7 +48,14 @@ def inject_drift(df: pd.DataFrame, seed: int = 7) -> pd.DataFrame:
     return cur
 
 
-def _dist_fig(ref: pd.Series, cur: pd.Series, name: str) -> go.Figure:
+def _dist_fig(ref: pd.Series, cur: pd.Series, name: str) -> Any:
+    # plotly é importado aqui, não no topo do módulo. `monitoring/__init__.py`
+    # reexporta `build_report`, então um import de topo faria
+    # `import adaptive_offers.monitoring` explodir sempre que o extra [bi] não
+    # estivesse instalado — que é exatamente o caso do CI, que instala só
+    # `.[dev]`. Isso derrubava a coleta do pytest inteira (exit code 2).
+    import plotly.graph_objects as go
+
     fig = go.Figure()
     fig.add_trace(go.Histogram(x=ref, name="referência", opacity=0.65,
                                marker_color="#6C5CE7", histnorm="probability density"))

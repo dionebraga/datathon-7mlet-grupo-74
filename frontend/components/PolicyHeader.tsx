@@ -4,14 +4,26 @@ import { motion } from "framer-motion";
 import { Activity, Database, Radio, Satellite } from "lucide-react";
 import type { Health, Policy } from "@/lib/types";
 
-function Status({ on, label }: { on: boolean; label: string }) {
+/** Pílula de estado. `on` controla a cor; passe `icon` para trocar o ponto. */
+function Status({
+  on,
+  label,
+  icon,
+  title,
+}: {
+  on: boolean;
+  label: string;
+  icon?: React.ReactNode;
+  title?: string;
+}) {
   return (
     <span
+      title={title}
       className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
         on ? "border-success/30 bg-success/10 text-success" : "border-border bg-white/5 text-muted"
       }`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${on ? "bg-success" : "bg-muted"}`} />
+      {icon ?? <span className={`h-1.5 w-1.5 rounded-full ${on ? "bg-success" : "bg-muted"}`} />}
       {label}
     </span>
   );
@@ -45,14 +57,39 @@ export function PolicyHeader({ health, policy }: { health?: Health; policy?: Pol
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Status on={!!health?.policy_loaded} label="Política" />
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-bold text-muted">
-          <Database className="h-3.5 w-3.5" /> Feature Store {health?.feature_store_materialized ? "✓" : "—"}
-        </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-bold text-muted">
-          {health?.status === "ok" ? <Radio className="h-3.5 w-3.5 text-success" /> : <Activity className="h-3.5 w-3.5" />}
-          API {health?.status ?? "?"}
-        </span>
+        {/* Os três badges usam a MESMA linguagem visual. Antes, Feature Store e
+            API eram sempre cinza e só trocavam o caractere (✓/—), então
+            apareciam "apagados" ao lado de uma Política verde mesmo estando
+            saudáveis — o estilo dizia o contrário do conteúdo. */}
+        <Status
+          on={!!health?.policy_loaded}
+          label="Política"
+          title={health ? (health.policy_loaded ? "Política carregada" : "Nenhuma política ativa") : "API inacessível"}
+        />
+        <Status
+          on={!!health?.feature_store_materialized}
+          label={`Feature Store ${health?.feature_store_materialized ? "✓" : "—"}`}
+          icon={<Database className="h-3.5 w-3.5" />}
+          title={
+            health
+              ? health.feature_store_materialized
+                ? "Feature store materializada"
+                : "Feature store vazia — rode: adaptive-offers pipeline"
+              : "API inacessível — o estado real é desconhecido"
+          }
+        />
+        <Status
+          on={health?.status === "ok"}
+          label={`API ${health?.status ?? "off"}`}
+          icon={
+            health?.status === "ok" ? (
+              <Radio className="h-3.5 w-3.5" />
+            ) : (
+              <Activity className="h-3.5 w-3.5" />
+            )
+          }
+          title={health ? "API respondendo" : "Sem resposta — rode: adaptive-offers serve"}
+        />
       </div>
     </motion.header>
   );
